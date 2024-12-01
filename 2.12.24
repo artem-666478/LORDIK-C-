@@ -1,0 +1,233 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+};
+
+/* Функция для создания нового узла
+Node* CreateNewNode(int value) {
+    Node* newNode = new Node();
+    newNode->data = value;
+    newNode->next = nullptr;
+    return newNode;
+}
+
+*/
+/*
+Функция для добавления узла в конец списка
+void AppendNode(Node** headRef, int value) {
+    if (*headRef == nullptr) {
+        *headRef = CreateNewNode(value);
+        return;
+    }
+
+    Node* current = *headRef;
+    while (current->next != nullptr) {
+        current = current->next;
+    }
+    current->next = CreateNewNode(value);
+}
+*/
+/* Функция для вывода содержимого списка
+void PrintList(Node* head) {
+    Node* temp = head;
+    while (temp != nullptr) {
+        cout << temp->data << " ";
+        temp = temp->next;
+    }
+    cout << endl;
+}
+*/
+/* Функция для нахождения максимального элемента в списке
+int MaxOfList(Node* head) {
+    if (head == nullptr) {
+        throw runtime_error("Список пуст");
+    }
+
+    int maxVal = head->data;
+    Node* current = head->next;
+    while (current != nullptr) {
+        if (current->data > maxVal) {
+            maxVal = current->data;
+        }
+        current = current->next;
+    }
+    return maxVal;
+}
+*/
+/* Функция для нахождения минимального элемента в списке
+int MinOfList(Node* head) {
+    if (head == nullptr) {
+        throw runtime_error("Список пуст");
+    }
+
+    int minVal = head->data;
+    Node* current = head->next;
+    while (current != nullptr) {
+        if (current->data < minVal) {
+            minVal = current->data;
+        }
+        current = current->next;
+    }
+    return minVal;
+}
+*/
+/* Функция для вычисления суммы всех элементов в списке
+int SumOfList(Node* head) {
+    if (head == nullptr) {
+        return 0;
+    }
+
+    int sum = 0;
+    Node* current = head;
+    while (current != nullptr) {
+        sum += current->data;
+        current = current->next;
+    }
+    return sum;
+}
+*/
+/* Функция для проверки наличия элемента в списке
+bool ContainsList(Node* head, int targetValue) {
+    if (head == nullptr) {
+        return false;
+    }
+
+    Node* current = head;
+    while (current != nullptr) {
+        if (current->data == targetValue) {
+            return true;
+        }
+        current = current->next;
+    }
+    return false;
+}
+*/
+/* Функция для удаления элемента из списка по индексу
+Node* DeleteElementFromList(Node* head, int index) {
+    if (index < 0 || head == nullptr) {
+        return head; // Не делаем ничего, если индекс отрицательный или список пустой
+    }
+
+    Node* prev = nullptr;
+    Node* current = head;
+    for (int i = 0; i < index && current != nullptr; ++i) {
+        prev = current;
+        current = current->next;
+    }
+
+    if (prev == nullptr) { // Удаляем первый узел
+        head = current->next;
+    }
+    else {
+        prev->next = current->next;
+    }
+
+    delete current;
+    return head;
+}
+*/
+/* Функция для копирования списка
+Node* CopyList(Node* head) {
+    if (head == nullptr) {
+        return nullptr;
+    }
+
+    Node* newHead = CreateNewNode(head->data);
+    Node* current = head->next;
+    Node* newCurrent = newHead;
+
+    while (current != nullptr) {
+        newCurrent->next = CreateNewNode(current->data);
+        newCurrent = newCurrent->next;
+        current = current->next;
+    }
+
+    return newHead;
+}
+*/
+/* Функция для обмена двух узлов по индексам
+void SwapList(Node* head, int index1, int index2) {
+    if (index1 == index2 || head == nullptr) {
+        return; // Ничего не делать, если индексы совпадают или список пустой
+    }
+
+    Node* node1Prev = nullptr;
+    Node* node1 = head;
+    for (int i = 0; i < index1 && node1 != nullptr; ++i) {
+        node1Prev = node1;
+        node1 = node1->next;
+    }
+
+    Node* node2Prev = nullptr;
+    Node* node2 = head;
+    for (int i = 0; i < index2 && node2 != nullptr; ++i) {
+        node2Prev = node2;
+        node2 = node2->next;
+    }
+
+    if (node1 == nullptr || node2 == nullptr) {
+        return; // Если хотя бы одного узла нет, то обмен невозможен
+    }
+
+    if (node1Prev != nullptr) {
+        node1Prev->next = node2;
+    }
+    else {
+        head = node2;
+    }
+
+    if (node2Prev != nullptr) {
+        node2Prev->next = node1;
+    }
+    else {
+        head = node1;
+    }
+
+    Node* temp = node1->next;
+    node1->next = node2->next;
+    node2->next = temp;
+}
+*/
+/* Функция для полного удаления списка
+void DeleteList(Node* head) {
+    Node* current = head;
+    while (current != nullptr) {
+        Node* next = current->next;
+        delete current;
+        current = next;
+    }
+}
+*/
+/* Функция преобразования статического массива в список
+Node* StaticArrayToList(int array[], int size) {
+    if (size <= 0) {
+        return nullptr;
+    }
+
+    Node* head = CreateNewNode(array[0]);
+    Node* current = head;
+    for (int i = 1; i < size; ++i) {
+        current->next = CreateNewNode(array[i]);
+        current = current->next;
+    }
+    return head;
+}
+*/
+/* Функция преобразования динамического массива в список
+Node* DynamicArrayToList(int* array, int size) {
+    if (size <= 0) {
+        return nullptr;
+    }
+
+    Node* head = CreateNewNode(array[0]);
+    Node* current = head;
+    for (int i = 1; i < size; ++i) {
+        current->next = CreateNewNode(array[i]);
+        current = current->next;
+    }
+    return head;
+}
+*/
