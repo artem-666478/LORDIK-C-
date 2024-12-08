@@ -1,0 +1,69 @@
+#include <iostream>
+#include <string>
+Usingnamespace std;
+/*
+string replaceVowels(const std::string &str) {
+    const string vowels = "aeiouyAEIOUY";  
+    string result;      
+
+    for (char ch : str) {        
+        if (vowels.find(ch) == string::npos) {
+            result += ch;                 
+        } else {
+            result += '_';         
+        }
+    }
+
+    return result;
+}
+
+int main() {
+    string input = "Programming is fun!";
+    string output = replaceVowels(input);
+    cout << output <<endl;  
+    return 0;
+}
+*/
+/*
+string toLowerCase (const std::string &str) {
+    string result;
+    result.reserve (str.size());
+
+    for (char ch : str) {
+        if (ch >= 'A' && ch <= 'Z') {
+            result.push_back(ch | 0x20);  
+        } else {
+            result.push_back(ch
+        }
+    }
+
+    return result;
+}
+
+int main() {
+    string input = "Hello, World!";
+    string output = toLowerCase(input);
+    cout << output << endl; 
+    return 0;
+}
+
+*/
+
+/*
+void toLowerCase(std::string &str) {
+    for (size_t i = 0; i < str.length(); ++i) {
+        if (str[i] >= 'A' && str[i] <= 'Z') {
+            str[i] = str[i] - 'A' + 'a';
+        }
+    }
+}
+
+int main() {
+    string input = "Hello, World!";
+    toLowerCase(input);
+    cout << input <<endl;  
+    return 0;
+}
+
+*/
+
