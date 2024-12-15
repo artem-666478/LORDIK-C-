@@ -1,0 +1,110 @@
+#include <iostream>
+using namespace std;
+//1
+/*
+int* getEvenNumbers(const int* arr, int size, int& newSize) {
+    newSize = 0;
+    for (int i = 0; i < size; ++i) {
+        if (arr[i] % 2 == 0) {
+            newSize++;
+        }
+    }
+
+    int* evenArr = new int[newSize];
+
+    int index = 0;
+    for (int i = 0; i < size; ++i) {
+        if (arr[i] % 2 == 0) {
+            evenArr[index++] = arr[i];
+        }
+    }
+
+    return evenArr;
+}
+
+int main() {
+    int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }; 
+    int size = sizeof(arr) / sizeof(arr[0]);
+
+    int newSize;
+    int* evenArr = getEvenNumbers(arr, size, newSize); 
+
+    cout << "Четные числа: ";
+    for (int i = 0; i < newSize; ++i) {
+        cout << evenArr[i] << " ";
+    }
+    cout <<endl;
+
+    delete[] evenArr;
+
+    return 0;
+}
+*/
+//2
+
+/*
+int findMax(const int* arr, int size) {
+    int max = arr[0]; 
+    for (int i = 1; i < size; ++i) {
+        if (arr[i] > max) {
+            max = arr[i]; 
+        }
+    }
+    return max;
+}
+
+int findMin(const int* arr, int size) {
+    int min = arr[0];
+    for (int i = 1; i < size; ++i) {
+        if (arr[i] < min) {
+            min = arr[i]; 
+        }
+    }
+    return min;
+}
+
+int main() {
+    int arr[] = { 3, 5, 2, 8, -1, 4 }; 
+    int size = sizeof(arr) / sizeof(arr[0]);
+
+    int max = findMax(arr, size);
+    int min = findMin(arr, size);
+
+    cout << "Максимальный элемент: " << max << endl;
+    cout << "Минимальный элемент: " << min << endl;
+
+    return 0;
+}
+*/
+
+//3
+
+/*
+int countWords(const char* str) {
+    if (str == nullptr || *str == '\0') return 0;  
+
+    int wordCount = 0;
+    bool inWord = false;
+
+    while (*str) {
+        if (*str != ' ') {
+            if (!inWord) { 
+                inWord = true;
+                wordCount++;
+            }
+        }
+        else {
+            inWord = false; 
+        }
+        str++;
+    }
+
+    return wordCount;
+}
+
+int main() {
+    const char* str = "Hello, this is a test string.";
+    cout << "Количество слов в строке: " << countWords(str) << endl; 
+    return 0;
+}
+*/
