@@ -1,0 +1,66 @@
+/* 
+Минимальный и максимальный элемент массива : 
+Напишите две функции, которые принимают массив чисел и его размер. 
+Первая функция должна вернуть максимальный элемент, вторая - минимальный. 
+9.*/ 
+/* 
+int find_max(int arr[], int n) { 
+ int max = arr[0];  
+ for (int i = 1; i < n; i++) { 
+  if (arr[i] > max) { 
+   max = arr[i]; 
+  } 
+ } 
+ return max; 
+} 
+ 
+int find_min(int arr[], int n) { 
+ int min = arr[0];   
+ for (int i = 1; i < n; i++) { 
+  if (arr[i] < min) { 
+   min = arr[i]; 
+  } 
+ } 
+ return min; 
+} 
+ 
+int main() { 
+ setlocale(LC_ALL, "RUS"); 
+ int array[] = { 21, 32, 1546, 8786, 86, 56 }; 
+ int size = sizeof(array) / sizeof(array[0]); 
+ 
+ int max_value = find_max(array, size); 
+ int min_value = find_min(array, size); 
+ 
+ printf("Максимальный элемент: %d\n", max_value); 
+ printf("Минимальный элемент: %d\n", min_value); 
+ 
+ return 0; 
+} 
+ 
+/* 
+2. 
+Напишите функцию, которая принимает указатель на строку и возвращает 
+указатель на новую строку, содержащую строку в обратном порядке. 
+*/ 
+ 
+string reverse(string gg) { 
+ 
+ int length = gg.length(); 
+ 
+ for (int i = 0; i < length / 2; ++i) { 
+  char temp = gg[i]; 
+  gg[i] = gg[length - i - 1]; 
+  gg[length - i - 1] = temp; 
+ } 
+ 
+ return gg; 
+} 
+ 
+int main() { 
+  
+ string qq = "Hello"; 
+ cout << qq<<endl; 
+ cout<< reverse(qq) <<endl; 
+ return 0; 
+}
