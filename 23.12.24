@@ -1,0 +1,64 @@
+#include <iostream>
+using namespace std;
+
+struct treg {
+    double width;
+    double height;
+
+    treg(double w, double h) : width(w), height(h) {}
+
+    treg operator+(const treg& other) const {
+        return treg(this->width + other.width, this->height + other.height);
+    }
+
+    treg operator-(const treg& other) const {
+        double newWidth = this->width - other.width;
+        double newHeight = this->height - other.height;
+
+        if (newWidth < 0 || newHeight < 0) {
+            throw invalid_argument("Размеры не могут быть отрицательными");
+        }
+        return treg(newWidth, newHeight);
+    }
+
+    double operator/(const treg& other) const {
+        double area1 = this->width * this->height;
+        double area2 = other.width * other.height;
+        if (area2 == 0) {
+        }
+        return area1 / area2;
+    }
+
+    treg operator*(double factor) const {
+        return treg(this->width * factor, this->height * factor);
+    }
+};
+
+int main() {
+    treg rect1(4.0, 5.0); 
+    treg rect2(2.0, 3.0); 
+
+    treg rectSum = rect1 + rect2;
+    cout << "Сложение: Ширина = " << rectSum.width << ", Высота = " << rectSum.height << endl;
+
+    try {
+        treg rectDiff = rect1 - rect2;
+        cout << "Вычитание: Ширина = " << rectDiff.width << ", Высота = " << rectDiff.height <<endl;
+    }
+    catch (const invalid_argument& e) {
+        cerr << e.what() <<endl;
+    }
+
+    try {
+        double divisionResult = rect1 / rect2;
+        cout << "Площадь rect1 вмещает rect2 " << divisionResult << " раз." << endl;
+    }
+    catch (const runtime_error& e) {
+        cerr << e.what() << endl;
+    }
+
+    treg rectMul = rect1 * 2.0;
+    cout << "Умножение: Ширина = " << rectMul.width << ", Высота = " << rectMul.height <<endl;
+
+    return 0;
+}
