@@ -1,0 +1,87 @@
+#include <iostream>
+using namespace std;
+
+void rotate(int** matrix, int n, int gradus) {
+
+    gradus = gradus % 360;
+
+    if (gradus == 90) {
+        int** temp = new int* [n];
+        for (int i = 0; i < n; i++) {
+            temp[i] = new int[n];
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                temp[j][n - 1 - i] = matrix[i][j];
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                matrix[i][j] = temp[i][j];
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            delete[] temp[i];
+        }
+        delete[] temp;
+    }
+    else if (gradus == 180) {
+        for (int i = 0; i < n / 2; i++) {
+            for (int j = 0; j < n; j++) {
+                swap(matrix[i][j], matrix[n - 1 - i][j]);
+            }
+        }
+    }
+    else if (gradus == 270) {
+        rotate(matrix, n, 90);
+        rotate(matrix, n, 90);
+        rotate(matrix, n, 90);
+    }
+}
+
+void printMatrix(int** matrix, int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << matrix[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+int main() {
+    setlocale(LC_ALL, "rus");
+    int n;
+    cout << "Введите размер матрицы (n): ";
+    cin >> n;
+
+    int** matrix = new int* [n];
+    for (int i = 0; i < n; i++) {
+        matrix[i] = new int[n];
+    }
+
+    cout << "Введите элементы матрицы:" << endl;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cin >> matrix[i][j];
+        }
+    }
+
+    int degrees;
+    cout << "Введите угол поворота (0, 90, 180, 270): ";
+    cin >> degrees;
+
+    rotate(matrix, n, degrees);
+
+    cout << "Повернутая матрица:" << endl;
+    printMatrix(matrix, n);
+
+    for (int i = 0; i < n; i++) {
+        delete[] matrix[i];
+    }
+    delete[] matrix;
+
+    return 0;
+}
