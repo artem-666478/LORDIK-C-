@@ -1,0 +1,72 @@
+@Composable
+fun Task7() {
+    val context = LocalContext.current
+    var inputString by remember { mutableStateOf("") }
+
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        )
+        {
+            Text("Задание номер 6")
+            TextField(
+                inputString, { newText ->
+                    if (newText.length <= 1) {
+                        inputString = newText
+                        if (inputString.lowercase().contains('0')) {
+                            if (inputString.lowercase().contains('1')) {
+                                if (inputString.lowercase().contains('2')) {
+                                    if (inputString.lowercase().contains('3')) {
+                                        if (inputString.lowercase().contains('4')) {
+                                            if (inputString.lowercase().contains('5')) {
+                                                if (inputString.lowercase().contains('6')) {
+                                                    if (inputString.lowercase().contains('7')) {
+                                                        if (inputString.lowercase().contains('8')) {
+                                                            if (inputString.lowercase()
+                                                                    .contains('9')
+                                                            ) {
+                                                                val toast = Toast.makeText(
+                                                                    context,
+                                                                    "Это цифра!",
+                                                                    LENGTH_SHORT
+                                                                )
+                                                                if (inputString.lowercase()
+                                                                        .contains('<')
+                                                                ) {
+                                                                    if (inputString.lowercase()
+                                                                            .contains('#')
+                                                                    ) {
+                                                                        if (inputString.lowercase()
+                                                                                .contains('&')
+                                                                        ) {
+                                                                            val toast1 =
+                                                                                Toast.makeText(
+                                                                                    context,
+                                                                                    "Это цифра!",
+                                                                                    LENGTH_SHORT
+                                                                                )
+                                                                            toast.show()
+                                                                            toast1.show()
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+}
