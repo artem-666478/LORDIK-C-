@@ -1,0 +1,67 @@
+#include <iostream>
+
+using namespace std;
+
+
+void findSaddlePoints(int** matrix, int rows, int cols) {
+    bool found = false; 
+
+    for (int i = 0; i < rows; ++i) {
+        int minElement = matrix[i][0];
+        int minColIndex = 0;
+
+        for (int j = 1; j < cols; ++j) {
+            if (matrix[i][j] < minElement) {
+                minElement = matrix[i][j];
+                minColIndex = j;
+            }
+        }
+
+        bool isSaddlePoint = true;
+        for (int k = 0; k < rows; ++k) {
+            if (matrix[k][minColIndex] > minElement) {
+                isSaddlePoint = false;
+                break;
+            }
+        }
+
+        if (isSaddlePoint) {
+            cout << "Седловая точка: " << minElement
+                << " на позиции (" << i << ", " << minColIndex << ")" << endl;
+            found = true;
+        }
+    }
+
+    if (!found) {
+        cout << "Седловых точек не найдено." << endl;
+    }
+}
+
+int main() {
+    setlocale(LC_ALL, "rus");
+    int rows, cols;
+
+    cout << "Введите количество строк и столбцов: ";
+    cin >> rows >> cols;
+
+    int** matrix = new int* [rows];
+    for (int i = 0; i < rows; ++i) {
+        matrix[i] = new int[cols];
+    }
+
+    cout << "Введите элементы матрицы:" << endl;
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            cin >> matrix[i][j]; 
+        }
+    }
+
+    findSaddlePoints(matrix, rows, cols);
+
+    for (int i = 0; i < rows; ++i) {
+        delete[] matrix[i];
+    }
+    delete[] matrix;
+
+    return 0;
+}
