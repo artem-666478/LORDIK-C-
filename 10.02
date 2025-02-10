@@ -1,0 +1,128 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+const int MAX_SOCKS = 10;
+const int MAX_FOOTWEAR = 10;
+const int MAX_CUSTOMERS = 10;
+
+class Socks {
+private:
+    string size; 
+    string color; 
+
+public:
+    Socks(const string& size = "", const string& color = "")
+        : size(size), color(color) {}
+
+    void display() const {
+        cout << "Socks(Size: " << size << ", Color: " << color << ")\n";
+    }
+
+    string getSize() const { return size; }
+    string getColor() const { return color; }
+};
+
+class Footwear {
+private:
+    string size; 
+    string color; 
+    string brand; 
+    double price; 
+
+public:
+    Footwear(const string& size = "", const string& color = "",
+        const string& brand = "", double price = 0.0)
+        : size(size), color(color), brand(brand), price(price) {}
+
+    void display() const {
+        cout << "Footwear(Size: " << size << ", Color: " << color
+            << ", Brand: " << brand << ", Price: " << price << ")\n";
+    }
+};
+
+class Customer {
+private:
+    string name; 
+    string email; 
+
+public:
+    Customer(const string& name = "", const string& email = "")
+        : name(name), email(email) {}
+
+    void display() const {
+        cout << "Customer(Name: " << name << ", Email: " << email << ")\n";
+    }
+};
+
+class Shop {
+private:
+    Socks socksInventory[MAX_SOCKS]; 
+    Footwear footwearInventory[MAX_FOOTWEAR]; 
+    Customer customers[MAX_CUSTOMERS]; 
+    int socksCount = 0; 
+    int footwearCount = 0; 
+    int customersCount = 0; 
+
+public:
+    void addSocks(const Socks& socks) {
+        if (socksCount < MAX_SOCKS) {
+            socksInventory[socksCount++] = socks;
+        }
+        else {
+            cout << "Список носков переполнен!\n";
+        }
+    }
+
+    void addFootwear(const Footwear& footwear) {
+        if (footwearCount < MAX_FOOTWEAR) {
+            footwearInventory[footwearCount++] = footwear;
+        }
+        else {
+            cout << "Список обуви переполнен!\n";
+        }
+    }
+
+    void addCustomer(const Customer& customer) {
+        if (customersCount < MAX_CUSTOMERS) {
+            customers[customersCount++] = customer;
+        }
+        else {
+            cout << "Список клиентов переполнен!\n";
+        }
+    }
+
+    void displayInventory() const {
+        cout << "Socks Inventory:\n";
+        for (int i = 0; i < socksCount; ++i) {
+            socksInventory[i].display();
+        }
+
+        cout << "Footwear Inventory:\n";
+        for (int i = 0; i < footwearCount; ++i) {
+            footwearInventory[i].display();
+        }
+
+        cout << "Customers:\n";
+        for (int i = 0; i < customersCount; ++i) {
+            customers[i].display();
+        }
+    }
+};
+
+int main() {
+    Shop shop;
+
+    shop.addSocks(Socks("M", "Red"));
+    shop.addSocks(Socks("L", "Blue"));
+
+    shop.addFootwear(Footwear("38", "Black", "Nike", 75.99));
+    shop.addFootwear(Footwear("39", "White", "Adidas", 89.50));
+
+    shop.addCustomer(Customer("egor", "egor@example.com"));
+    shop.addCustomer(Customer("lexa", "lexakolos@example.com"));
+
+    shop.displayInventory();
+
+    return 0;
+}
