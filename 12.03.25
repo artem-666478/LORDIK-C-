@@ -1,0 +1,111 @@
+#include <iostream>
+
+using namespace std;
+
+class Distance {
+private:
+    int kilometers; 
+    int meters;     
+
+    void normalize() {
+        if (meters >= 1000) {
+            kilometers += meters / 1000;
+            meters = meters % 1000;
+        } else if (meters < 0) {
+            int kmAdjust = (abs(meters) + 999) / 1000; 
+            kilometers -= kmAdjust;
+            meters = (meters + 1000 * kmAdjust) % 1000;
+        }
+    }
+
+public:
+    Distance(int km = 0, int m = 0) : kilometers(km), meters(m) {
+        normalize();
+    }
+
+    Distance operator+(const Distance& other) const {
+        return Distance(kilometers + other.kilometers, meters + other.meters);
+    }
+
+    Distance operator-(const Distance& other) const {
+        return Distance(kilometers - other.kilometers, meters - other.meters);
+    }
+
+    // Перегрузка оператора умножения
+    Distance operator*(int scalar) const {
+        return Distance(kilometers * scalar, meters * scalar);
+    }
+
+    Distance operator/(int scalar) const {
+        if (scalar == 0) {
+            throw invalid_argument("Деление на ноль!");
+        }
+        return Distance(kilometers / scalar, meters / scalar);
+    }
+
+    bool operator==(const Distance& other) const {
+        return (kilometers == other.kilometers && meters == other.meters);
+    }
+
+    bool operator!=(const Distance& other) const {
+        return !(*this == other);
+    }
+
+    void print() const {
+        cout << kilometers << " km " << meters << " m";
+    }
+
+    void input() {
+        cout << "Введите расстояние (км м): ";
+        cin >> kilometers >> meters;
+        normalize();
+    }
+};
+
+int main() {
+    Distance d1(2, 500); // 2 км 500 м
+    Distance d2(1, 800); // 1 км 800 м
+
+    Distance sum = d1 + d2; // Сложение
+    Distance diff = d1 - d2; // Вычитание
+    Distance product = d1 * 2; // Умножение
+    Distance quotient = d1 / 2; // Деление
+
+    cout << "d1: ";
+    d1.print();
+    cout << "\n";
+
+    cout << "d2: ";
+    d2.print();
+    cout << "\n";
+
+    cout << "Сумма: ";
+    sum.print();
+    cout << "\n";
+
+    cout << "Разность: ";
+    diff.print();
+    cout << "\n";
+
+    cout << "Умножение: ";
+    product.print();
+    cout << "\n";
+
+    cout << "Деление: ";
+    quotient.print();
+    cout << "\n";
+
+    if (d1 != d2) {
+        cout << "d1 не равно d2\n";
+    }
+
+    Distance d3;
+    d3.input();
+    cout << "Вы ввели: ";
+    d3.print();
+    cout << "\n";
+
+    return 0;
+}
+
+Найти еще
