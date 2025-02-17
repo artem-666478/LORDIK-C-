@@ -1,0 +1,52 @@
+#include <iostream>
+using namespace std;
+/*
+class Cone {
+private:
+    double radius;  
+    double height;  
+
+public:
+    Cone() : radius(1), height(1) {}
+
+    Cone(double r, double h) : radius(r), height(h) {}
+
+    double SurfaceArea() const {
+        double slantHeight = radius + height;
+        return 3.14 * radius * (slantHeight + radius);
+    }
+
+    double Volume() const {
+        return (3.14 * radius * radius * height) / 3;
+    }
+
+    friend istream& operator>>(istream& in, Cone& cone) {
+        cout << "Введите радиус и высоту: ";
+        in >> cone.radius >> cone.height;
+        return in;
+    }
+
+    friend ostream& operator<<(ostream& out, const Cone& cone) {
+        out << "Радиус: " << cone.radius << ", Высота: " << cone.height
+            << ", Площадь поверхности: " << cone.SurfaceArea()
+            << ", Объем: " << cone.Volume();
+        return out;
+    }
+};
+int main() {
+    setlocale(LC_ALL, "rus");
+    Cone cone1;
+
+    Cone cone2(5, 10);
+
+    Cone cone3;
+    cin >> cone3;
+
+    cout << cone1 << endl;
+    cout << cone2 << endl;
+    cout << cone3 << endl;
+
+    return 0;
+}
+*/
+
