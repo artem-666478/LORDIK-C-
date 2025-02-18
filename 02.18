@@ -1,0 +1,101 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Wheels {
+    int radius;
+    int type;
+    int ShirinaProtektera;
+
+public:
+    Wheels(int radius, int type, int ShirinaProtektera) {
+        this->radius = radius;
+        this->type = type;
+        this->ShirinaProtektera = ShirinaProtektera;
+    }
+
+    void print() {
+        cout << "Wheels - Radius: " << radius
+            << ", Type: " << type
+            << ", Width: " << ShirinaProtektera << endl;
+    }
+};
+
+class Engines {
+    int TypeTopliva;
+    int Power;
+    int kolvoCelindrow;
+
+public:
+    Engines(int TypeTopliva, int Power, int kolvoCelindrow) {
+        this->TypeTopliva = TypeTopliva;
+        this->Power = Power;
+        this->kolvoCelindrow = kolvoCelindrow;
+    }
+
+    void print() {
+        cout << "Engine - Fuel Type: " << TypeTopliva
+            << ", Power: " << Power
+            << ", Cylinders: " << kolvoCelindrow << endl;
+    }
+};
+
+class Body {
+    int xetchbek;
+    int universal;
+    int kupe;
+
+public:
+    Body(int xetchbek, int universal, int kupe) {
+        this->xetchbek = xetchbek;
+        this->universal = universal;
+        this->kupe = kupe;
+    }
+
+    void print() {
+        cout << "Body - Hatchback: " << xetchbek
+            << ", Universal: " << universal
+            << ", Coupe: " << kupe << endl;
+    }
+};
+
+class Marka {
+    string name; // Изменено на строку для имени марки
+
+public:
+    Marka(string name) : name(name) {}
+
+    void print() {
+        cout << "Marka: " << name << endl;
+    }
+};
+
+class Car : public Wheels, public Engines, public Body, public Marka {
+    string carName;
+
+public:
+    Car(string carName, int wheelRadius, int wheelType, int wheelWidth,
+        int engineFuelType, int enginePower, int engineCylinders,
+        int bodyHatchback, int bodyUniversal, int bodyCoupe,
+        string markaName)
+        : Wheels(wheelRadius, wheelType, wheelWidth),
+        Engines(engineFuelType, enginePower, engineCylinders),
+        Body(bodyHatchback, bodyUniversal, bodyCoupe),
+        Marka(markaName),
+        carName(carName) {}
+
+    void print() {
+        cout << "Car Name: " << carName << endl;
+        Wheels::print();
+        Engines::print();
+        Body::print();
+        Marka::print();
+    }
+};
+
+int main() {
+    Car myCar("My Car", 17, 1, 225, 2, 150, 4, 1, 0, 0, "Toyota");
+    myCar.print();
+
+    return 0;
+}
