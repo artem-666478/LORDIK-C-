@@ -1,0 +1,82 @@
+#include <iostream>
+using namespace std;
+
+class Point;
+class Function;
+
+
+class Point {
+    friend  Function;
+private:
+    int x;
+    int y;
+public:
+    Point(int x, int y) {
+        this->x = x;
+        this->y = y;
+    }
+    friend void swap(Point&, Point&);
+    void Print(){
+        cout << "x: " << x << "y: " << y;
+    }
+};
+void swap(Point& a, Point& b) {
+    int op;
+    op = a.x;
+    a.x = b.x;
+    b.x = op;
+    op = a.y;
+    a.y = b.y;
+    b.y = op;
+}
+
+
+class Function {
+    friend int averageFunction(Function&, int, int);
+private:
+    int a;
+    int b;
+    int c;
+
+public:
+    Function() {
+        a = 0;
+        b = 0;
+        c = 0;
+    }
+    Function(int i_a, int i_b, int i_c) {
+        a = i_a;
+        b = i_b;
+        c = i_c;
+    }
+
+    bool isContains(Point& point) {
+        return (point.y == a * point.x * point.x + b * point.x + c) ? true : false;
+    }
+    void print() {
+        cout << a << "x^2+" << b << "x+" << c;
+    }
+};
+int averageFunction(Function& fun, int l, int r) {
+    int sum = 0;
+    int con = 0;
+    for (int i = l; i <= r; i++) {
+        int x = i;
+        int y = fun.a * x * x + fun.b * x + fun.c;
+        sum += y;
+        con++;
+    }
+
+    sum = sum / con;
+    return sum;
+}
+
+int main()
+{
+    setlocale(LC_ALL, "rus");
+    Function fun(2, 4, 0);
+    Point poi(0, 0);
+    cout << fun.isContains(poi) << endl;
+    cout << averageFunction(fun, 2, 2) << endl;
+    fun.print();
+}
