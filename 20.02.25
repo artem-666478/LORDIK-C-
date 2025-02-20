@@ -28,3 +28,30 @@ fun MyApp() {
 
     ParticipantsList(participants)
 }
+
+
+
+@Composable
+fun EvenNumbersList() {
+    val evenNumbers = remember { mutableStateListOf(*Array(100) { it * 2 }) }
+
+    LazyColumn(modifier = Modifier.padding(16.dp)) {
+        items(evenNumbers) { number ->
+            Button(
+                onClick = {
+                    evenNumbers.remove(number) 
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+            ) {
+                Text(text = number.toString())
+            }
+        }
+    }
+}
+
+@Composable
+fun MyApp() {
+    EvenNumbersList()
+}
