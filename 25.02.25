@@ -1,0 +1,65 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Employee {
+public:
+    string name;
+    double salary;
+
+    Employee(const string& name, double salary) : name(name), salary(salary) {}
+
+    virtual double CalculateBonus() const = 0; 
+};
+
+class Manager : public Employee {
+public:
+    int numberOfSubordinates;
+
+    Manager(const string& name, double salary, int numberOfSubordinates)
+        : Employee(name, salary), numberOfSubordinates(numberOfSubordinates) {}
+
+    double CalculateBonus() const override {
+        return salary * 0.1 * numberOfSubordinates;
+    }
+};
+
+class Developer : public Employee {
+public:
+    int numberOfProjects;
+
+    Developer(const string& name, double salary, int numberOfProjects)
+        : Employee(name, salary), numberOfProjects(numberOfProjects) {}
+
+    double CalculateBonus() const override {
+        return salary * 0.05 * numberOfProjects;
+    }
+};
+
+class Intern : public Employee {
+public:
+    int internshipDuration; 
+
+    Intern(const string& name, double salary, int internshipDuration)
+        : Employee(name, salary), internshipDuration(internshipDuration) {}
+
+    double CalculateBonus() const override {
+        return internshipDuration > 3 ? 100.0 : 0.0; 
+    }
+};
+
+int main() {
+    Employee* manager = new Manager("artem", 5000.0, 5);
+    Employee* developer = new Developer("Andrey", 4000.0, 3);
+    Employee* intern = new Intern("lexa", 1500.0, 4);
+
+    cout << manager->name << " Bonus: " << manager->CalculateBonus() << endl;
+    cout << developer->name << " Bonus: " << developer->CalculateBonus() << endl;
+    cout << intern->name << " Bonus: " << intern->CalculateBonus() << endl;
+
+    delete manager;
+    delete developer;
+    delete intern;
+
+    return 0;
+}
