@@ -1,0 +1,13 @@
+fun main() {
+    val oddSquares = mutableListOf<Int>()
+
+    for (i in 1..100) {
+        if (i % 2 != 0) {
+            oddSquares.add(i * i)
+        }
+    }
+
+    for (square in oddSquares.reversed()) {
+        println(square)
+    }
+}
