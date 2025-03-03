@@ -1,0 +1,53 @@
+class pesh : public fig {
+public:
+    pesh(int x1, int y1, string name1) : fig(x1, y1, name1) {}
+
+    char getSymbol() const override {
+        return 'P';
+    }
+
+    bool canMove(int newX, int newY, ChessBoard& board) override {
+        int dx = newX - x;
+        int dy = newY - y;
+
+        
+        if (board.getPiece(x, y).isWhite) {
+            
+            if (dx > 0) return false;
+        }
+        else {
+          
+            if (dx < 0) return false;
+        }
+
+     
+        if (dy == 0 && abs(dx) == 1) {
+            
+            return !board.getPiece(newX, newY).figura;
+        }
+
+        
+        if (dy == 0 && abs(dx) == 2 && !Ismoved) {
+            
+            int middleX = x + (newX - x) / 2;
+            return !board.getPiece(middleX, newY).figura && !board.getPiece(newX, newY).figura;
+        }
+
+        
+        if (abs(dy) == 1 && abs(dx) == 1) {
+            
+            ChessBoard::Piece targetPiece = board.getPiece(newX, newY);
+            return targetPiece.figura && targetPiece.isWhite != board.getPiece(x, y).isWhite;
+        }
+
+        return false;
+    }
+
+    void setPosition(int newX, int newY) override {
+        if (!Ismoved) {
+            Ismoved = true;
+        }
+        x = newX;
+        y = newY;
+    }
+};
