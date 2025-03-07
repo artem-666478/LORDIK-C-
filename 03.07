@@ -1,0 +1,97 @@
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.radioButton
+import androidx.compose.material.Button
+import androidx.compose.material.RadioButton
+import androidx.compose.material.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+
+data class Question(val text: String, val options: List<String>, val correctAnswer: String)
+
+data class QuizLevel(val name: String, val questions: List<Question>)
+
+val quizLevels = listOf(
+    QuizLevel("Легкий", listOf(
+        Question("Какая страна самая крупная?", listOf("Китай", "Россия", "США"), "Россия"),
+        Question("Какой цвет небо?", listOf("Синий", "Зеленый", "Красный"), "Синий")
+    )),
+    QuizLevel("Нормальный", listOf(
+        Question("Какой сейчас год?", listOf("2025", "2000", "2008"), "2025"),
+        Question("Какая медаль за первое место?", listOf("Бронзовая", "Серебряная", "Золотая"), "Золотая")
+    )),
+    QuizLevel("Сложный", listOf(
+        Question("Кто написал 'Войну и мир'?", listOf("Толстой", "Достоевский", "Пушкин"), "Толстой"),
+        Question("Какой элемент обозначается символом 'O'?", listOf("Золото", "Кислород", "Серебро"), "Кислород")
+    ))
+)
+
+@Composable
+fun QuizApp() {
+    var selectedLevel by remember { mutableStateOf<QuizLevel?>(null) }
+    var currentQuestion by remember { mutableIntStateOf(0) }
+    var selectedAnswer by remember { mutableStateOf("") }
+    var score by remember { mutableIntStateOf(0) }
+    var quizFinished by remember { mutableStateOf(false) }
+    var enabledButton by remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        if (selectedLevel == null) {
+            // Выбор уровня сложности
+            Text(text = "Выберите уровень сложности:")
+            quizLevels.forEach { level ->
+                Button(onClick = {
+                    selectedLevel = level
+                    currentQuestion = 0
+                    score = 0
+                    quizFinished = false
+                }) {
+                    Text(text = level.name)
+                }
+            }
+        } else if (!quizFinished) {
+            Text(text = "Вопрос: ${selectedLevel!!.questions[currentQuestion].text}")
+            Spacer(modifier = Modifier.height(12.dp))
+
+            selectedLevel!!.questions[currentQuestion].options.forEach { option ->
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = selectedAnswer == option,
+                        onClick = {
+                            selectedAnswer = option
+                            enabledButton = true
+                        }
+                    )
+                    Text(text = option)
+                }
+            }
+
+            Button(onClick = {
+                if (selectedAnswer == selectedLevel!!.questions[currentQuestion].correctAnswer) {
+                    score++
+                }
+                if (currentQuestion < selectedLevel!!.questions.size - 1) {
+                    currentQuestion++
+                } else {
+                    quizFinished = true
+                }
+                selectedAnswer = ""
+                enabledButton = false
+            }, enabled = enabledButton) {
+                Text(text = if (currentQuestion < selectedLevel!!.questions.size - 1) "Следующий вопрос" else "Закончить")
+            }
+        } else {
+            // Результаты квиза
+            Text(text = "Ваш результат: $score/${selectedLevel!!.questions.size}")
+            Button(onClick = {
+                selectedLevel = null
+                currentQuestion = 0
+                score = 0
+                selectedAnswer = ""
+            }) {
+                Text(text = "Перезапустить квиз")
+            }
+        }
+    }
+}
