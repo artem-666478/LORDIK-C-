@@ -4,7 +4,6 @@ using namespace std;
 template <typename T>
 class LinkedList {
 public:
-    // Класс для узла списка
     class Node {
     public:
         T data;
@@ -85,19 +84,16 @@ public:
         current->next = buffer;
     }
 
-    // Метод для получения подсписка
     LinkedList<T> subList(int indexStart, int indexEnd) {
         LinkedList<T> newList;
         Node* current = Head;
         int currentIndex = 0;
 
-        // Пропускаем элементы до indexStart
         while (current != nullptr && currentIndex < indexStart) {
             current = current->next;
             currentIndex++;
         }
 
-        // Добавляем элементы от indexStart до indexEnd
         while (current != nullptr && currentIndex <= indexEnd) {
             newList.push(current->data);
             current = current->next;
@@ -107,7 +103,6 @@ public:
         return newList;
     }
 
-    // Метод для очистки списка
     void clear() {
         while (Head != nullptr) {
             Node* temp = Head;
@@ -129,12 +124,10 @@ int main() {
     cout << "Исходный список: ";
     list->print();
 
-    // Получаем подсписок
     LinkedList<string> subList = list->subList(1, 3);
     cout << "Подсписок (1-3): ";
     subList.print();
 
-    // Очищаем список
     list->clear();
     cout << "Список после очистки: ";
     list->print();
