@@ -1,0 +1,37 @@
+/* задача 1
+fun main() {
+    println("Введите символ:")
+    val input = readlnOrNull()?.firstOrNull()
+
+    if (input == null || !input.isUpperCase() || !input.isLetter()) {
+        println("Ошибка: введен недопустимый символ.")
+        return
+    }
+
+    when (input) {
+        'L', 'M', 'K', 'D' -> println("Это согласные буквы")
+        else -> println("Возможно, это гласные буквы")
+    }
+}
+*/
+
+/* задача 2
+fun main() {
+    println("Введите первую строку:")
+    val str1 = readlnOrNull() ?: ""
+    println("Введите вторую строку:")
+    val str2 = readlnOrNull() ?: ""
+
+    val result = str1 + str2
+    println("Результат: $result")
+}
+
+/* задача 3
+fun main() {
+    println("Введите строку:")
+    val input = readlnOrNull() ?: ""
+
+    val reversed = input.reversed()
+    println("Инвертированная строка: $reversed")
+}
+*/
