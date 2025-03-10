@@ -71,12 +71,12 @@ public:
             current = current->next;
         }
 
-        if (current == nullptr) return; // элемент не найден
+        if (current == nullptr) return; 
 
         if (previous == nullptr) {
-            Head = current->next; // удаляем голову
+            Head = current->next;
         } else {
-            previous->next = current->next; // удаляем элемент
+            previous->next = current->next; 
         }
 
         delete current;
@@ -89,7 +89,7 @@ public:
         Node* previous = nullptr;
 
         if (index == 0) {
-            Head = current->next; // удаляем голову
+            Head = current->next; 
             delete current;
             return;
         }
@@ -100,9 +100,9 @@ public:
             index--;
         }
 
-        if (current == nullptr) return; // индекс вне диапазона
+        if (current == nullptr) return; 
 
-        previous->next = current->next; // удаляем элемент
+        previous->next = current->next; 
         delete current;
     }
 
@@ -132,8 +132,8 @@ public:
     }
 
     LinkedList& operator= (const LinkedList& list) {
-        if (this != &list) { // предотвращение самоприсваивания
-            removeAll(); // очистка текущего списка
+        if (this != &list) { 
+            removeAll(); 
             Node* currentSecond = list.Head;
             while (currentSecond != nullptr) {
                 this->push(currentSecond->data);
@@ -152,7 +152,7 @@ public:
     }
 
     ~LinkedList() {
-        removeAll(); // очистка при разрушении
+        removeAll();
     }
 };
 
