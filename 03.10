@@ -1,0 +1,176 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+template <typename T>
+class LinkedList {
+public:
+    class Node {
+    public:
+        T data;
+        Node* next;
+
+        Node() : data(T()), next(nullptr) {}
+
+        Node(T value) : data(value), next(nullptr) {}
+    };
+
+    Node* Head;
+
+    LinkedList() : Head(nullptr) {}
+    LinkedList(Node* head) : Head(head) {}
+
+    void push(T value) {
+        if (Head == nullptr) {
+            Head = new Node(value);
+        } else {
+            Node* current = Head;
+            while (current->next != nullptr) {
+                current = current->next;
+            }
+            current->next = new Node(value);
+        }
+    }
+
+    void print() {
+        if (Head == nullptr) {
+            cout << "Список пустой" << endl;
+        } else {
+            Node* current = Head;
+            while (current != nullptr) {
+                cout << current->data << " ";
+                current = current->next;
+            }
+            cout << endl;
+        }
+    }
+
+    T get(int index) {
+        if (Head == nullptr) {
+            throw out_of_range("Индекс вне диапазона");
+        } else {
+            Node* current = Head;
+            while (current != nullptr && index > 0) {
+                current = current->next;
+                index--;
+            }
+            if (current == nullptr) {
+                throw out_of_range("Индекс вне диапазона");
+            }
+            return current->data;
+        }
+    }
+
+    void remove(T data) {
+        Node* current = Head;
+        Node* previous = nullptr;
+
+        while (current != nullptr && current->data != data) {
+            previous = current;
+            current = current->next;
+        }
+
+        if (current == nullptr) return; // элемент не найден
+
+        if (previous == nullptr) {
+            Head = current->next; // удаляем голову
+        } else {
+            previous->next = current->next; // удаляем элемент
+        }
+
+        delete current;
+    }
+
+    void removeAt(int index) {
+        if (Head == nullptr) return;
+
+        Node* current = Head;
+        Node* previous = nullptr;
+
+        if (index == 0) {
+            Head = current->next; // удаляем голову
+            delete current;
+            return;
+        }
+
+        while (current != nullptr && index > 0) {
+            previous = current;
+            current = current->next;
+            index--;
+        }
+
+        if (current == nullptr) return; // индекс вне диапазона
+
+        previous->next = current->next; // удаляем элемент
+        delete current;
+    }
+
+    T& operator[](int i) {
+        Node* current = Head;
+        while (current != nullptr && i > 0) {
+            current = current->next;
+            i--;
+        }
+        if (current == nullptr) {
+            throw out_of_range("Индекс вне диапазона");
+        }
+        return current->data;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const LinkedList& list) {
+        if (list.Head == nullptr) {
+            os << "Список пустой";
+        } else {
+            Node* current = list.Head;
+            while (current != nullptr) {
+                os << current->data << " ";
+                current = current->next;
+            }
+        }
+        return os;
+    }
+
+    LinkedList& operator= (const LinkedList& list) {
+        if (this != &list) { // предотвращение самоприсваивания
+            removeAll(); // очистка текущего списка
+            Node* currentSecond = list.Head;
+            while (currentSecond != nullptr) {
+                this->push(currentSecond->data);
+                currentSecond = currentSecond->next;
+            }
+        }
+        return *this;
+    }
+
+    void removeAll() {
+        while (Head != nullptr) {
+            Node* temp = Head;
+            Head = Head->next;
+            delete temp;
+        }
+    }
+
+    ~LinkedList() {
+        removeAll(); // очистка при разрушении
+    }
+};
+
+int main() {
+    setlocale(LC_ALL, "rus");
+    LinkedList<string> list;
+    list.push("10");
+    list.push("15");
+    list.push("20");
+    list.push("25");
+    list.push("30");
+
+    LinkedList<string> list2;
+    list2 = list;
+
+    list[3] = "Error";
+    list2.print();
+    list.print();
+
+    return 0;
+}
