@@ -1,0 +1,213 @@
+#include <iostream>
+
+using namespace std;
+
+const int MAX_ENGINES = 100; 
+
+class Engine {
+public:
+    int power;
+    string name;
+
+    Engine() : power(0), name("Unknown") {}
+
+    Engine(int p, string n) : power(p), name(n) {
+        if (p < 0) {
+            cout << "Ошибка: Мощность не может быть отрицательной." << endl;
+            power = 0; 
+        }
+    }
+
+    virtual void display() const {
+        cout << "Двигатель: " << name << ", Мощность: " << power << " л.с." << endl;
+    }
+};
+
+class DVS : public Engine {
+public:
+    int cylinders;
+
+    DVS() : Engine(), cylinders(0) {}
+
+    DVS(int p, string n, int c) : Engine(p, n), cylinders(c) {
+        if (c < 0) {
+            cout << "Ошибка: Количество цилиндров не может быть отрицательным." << endl;
+            cylinders = 0; 
+        }
+    }
+
+    void display() const override {
+        cout << "Двигатель внутреннего сгорания: " << name << ", Мощность: " << power << " л.с., Цилиндры: " << cylinders << endl;
+    }
+};
+
+class DieselEngine : public DVS {
+public:
+    string fuelType;
+
+    DieselEngine() : DVS(), fuelType("Unknown") {}
+
+    DieselEngine(int p, string n, int c, string f) : DVS(p, n, c), fuelType(f) {}
+
+    void display() const override {
+        cout << "Дизельный двигатель: " << name << ", Мощность: " << power << " л.с., Цилиндры: " << cylinders << ", Топливо: " << fuelType << endl;
+    }
+};
+
+class ReactiveEngine : public Engine {
+public:
+    double thrust;
+
+    ReactiveEngine() : Engine(), thrust(0.0) {}
+
+    ReactiveEngine(int p, string n, double t) : Engine(p, n), thrust(t) {
+        if (t < 0) {
+            cout << "Ошибка: Тяга не может быть отрицательной." << endl;
+            thrust = 0; 
+        }
+    }
+
+    void display() const override {
+        cout << "Реактивный двигатель: " << name << ", Мощность: " << power << " л.с., Тяга: " << thrust << " кг" << endl;
+    }
+};
+
+class EngineCollection {
+private:
+    Engine* engines[MAX_ENGINES]; 
+    int count; 
+
+public:
+    EngineCollection() : count(0) {}
+
+    ~EngineCollection() {
+        for (int i = 0; i < count; i++) {
+            delete engines[i];
+        }
+    }
+
+    void addEngine(Engine* engine) {
+        if (count < MAX_ENGINES) {
+            engines[count++] = engine;
+        }
+        else {
+            cout << "Ошибка: Превышено максимальное количество двигателей." << endl;
+        }
+    }
+
+    void removeEngine(int index) {
+        if (index >= 0 && index < count) {
+            delete engines[index];
+            for (int i = index; i < count - 1; i++) {
+                engines[i] = engines[i + 1];
+            }
+            count--;
+        }
+        else {
+            cout << "Ошибка: Некорректный индекс." << endl;
+        }
+    }
+
+    void displayEngines() const {
+        for (int i = 0; i < count; i++) {
+            cout << "Индекс: " << i << " - ";
+            engines[i]->display();
+        }
+    }
+
+    void compareEngines(int index1, int index2) const {
+        if (index1 >= 0 && index1 < count && index2 >= 0 && index2 < count) {
+            cout << "Сравнение элементов с индексами " << index1 << " и " << index2 << ": "
+                << (engines[index1] == engines[index2] ? "Да" : "Нет") << endl;
+        }
+        else {
+            cout << "Ошибка: Некорректные индексы." << endl;
+        }
+    }
+};
+
+int main() {
+    setlocale(LC_ALL, "rus");
+    EngineCollection collection;
+    int choice;
+
+    do {
+        cout << "\nМеню:\n";
+        cout << "1. Добавить двигатель\n";
+        cout << "2. Удалить двигатель\n";
+        cout << "3. Отобразить все двигатели\n";
+        cout << "4. Сравнить два двигателя\n";
+        cout << "0. Выход\n";
+        cout << "Введите ваш выбор: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1: {
+            int type;
+            cout << "Выберите тип двигателя:\n";
+            cout << "1. Двигатель внутреннего сгорания\n";
+            cout << "2. Дизельный двигатель\n";
+            cout << "3. Реактивный двигатель\n";
+            cout << "Введите ваш выбор: ";
+            cin >> type;
+
+            int power, cylinders;
+            string name, fuelType;
+            double thrust;
+
+            cout << "Введите мощность: ";
+            cin >> power;
+            cout << "Введите название: ";
+            cin >> name;
+
+            switch (type) {
+            case 1:
+                cout << "Введите количество цилиндров: ";
+                cin >> cylinders;
+                collection.addEngine(new DVS(power, name, cylinders));
+                break;
+            case 2:
+                cout << "Введите количество цилиндров: ";
+                cin >> cylinders;
+                cout << "Введите тип топлива: ";
+                cin >> fuelType;
+                collection.addEngine(new DieselEngine(power, name, cylinders, fuelType));
+                break;
+            case 3:
+                cout << "Введите тягу: ";
+                cin >> thrust;
+                collection.addEngine(new ReactiveEngine(power, name, thrust));
+                break;
+            default:
+                cout << "Некорректный тип двигателя." << endl;
+                break;
+            }
+            break;
+        }
+        case 2: {
+            int index;
+            cout << "Введите индекс двигателя для удаления: ";
+            cin >> index;
+            collection.removeEngine(index);
+            break;
+        }
+        case 3:
+            collection.displayEngines();
+            break;
+        case 4: {
+            int index1, index2;
+            cout << "Введите индексы двух двигателей для сравнения: ";
+            cin >> index1 >> index2;
+            collection.compareEngines(index1, index2);
+            break;
+        }
+        case 0:
+            cout << "Выход из программы." << endl;
+            break;
+        default:
+            cout << "Некорректный выбор. Попробуйте еще раз." << endl;
+        }
+    } while (choice != 0);
+
+    return 0;
+}
