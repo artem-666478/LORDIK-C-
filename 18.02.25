@@ -1,0 +1,248 @@
+#include <iostream>
+using namespace std;
+
+class Entity {
+protected:
+    int id;
+    string createdAt; 
+
+public:
+    Entity(int id) : id(id), createdAt("2023-10-01 12:00:00") {} 
+
+    int getId() const {
+        return id;
+    }
+
+    string getCreatedAt() const {
+        return createdAt;
+    }
+};
+
+class User : public Entity {
+private:
+    string name;
+    string email;
+
+public:
+    User(int id, const string& name, const string& email)
+        : Entity(id), name(name), email(email) {}
+
+    string getName() const {
+        return name;
+    }
+
+    void setName(const string& name) {
+        this->name = name;
+    }
+
+    string getEmail() const {
+        return email;
+    }
+
+    void setEmail(const string& email) {
+        this->email = email;
+    }
+};
+
+class Like : public Entity {
+private:
+    User* user;
+    Entity* target;  
+
+public:
+    Like(int id, User* user, Entity* target)
+        : Entity(id), user(user), target(target) {}
+
+    User* getUser() const {
+        return user;
+    }
+
+    Entity* getTarget() const {
+        return target;
+    }
+};
+
+class Comment : public Entity {
+private:
+    string text;
+    User* author;
+    Entity* target; 
+public:
+    Comment(int id, const string& text, User* author, Entity* target)
+        : Entity(id), text(text), author(author), target(target) {}
+
+    string getText() const {
+        return text;
+    }
+
+    void setText(const string& text) {
+        this->text = text;
+    }
+
+    User* getAuthor() const {
+        return author;
+    }
+
+    Entity* getTarget() const {
+        return target;
+    }
+};
+
+
+class Post : public Entity {
+private:
+    string text;
+    User* author;
+    Like* likes[10]; 
+    Comment* comments[10]; 
+    int likeCount;
+    int commentCount;
+
+public:
+    Post(int id, const string& text, User* author)
+        : Entity(id), text(text), author(author), likeCount(0), commentCount(0) {}
+
+    string getText() const {
+        return text;
+    }
+
+    void setText(const string& text) {
+        this->text = text;
+    }
+
+    User* getAuthor() const {
+        return author;
+    }
+
+    void addLike(Like* like) {
+        if (likeCount < 10) {
+            likes[likeCount++] = like;
+        } else {
+            cout << "Достигнуто максимальное количество лайков!" << endl;
+        }
+    }
+
+    void addComment(Comment* comment) {
+        if (commentCount < 10) {
+            comments[commentCount++] = comment;
+        } else {
+            cout << "Достигнуто максимальное количество комментариев!" << endl;
+        }
+    }
+
+    int getLikeCount() const {
+        return likeCount;
+    }
+
+    Like* getLike(int index) const {
+        if (index >= 0 && index < likeCount) {
+            return likes[index];
+        }
+        return nullptr;
+    }
+
+    int getCommentCount() const {
+        return commentCount;
+    }
+
+    Comment* getComment(int index) const {
+        if (index >= 0 && index < commentCount) {
+            return comments[index];
+        }
+        return nullptr;
+    }
+};
+
+class Community : public Entity {
+private:
+    string name;
+    string description;
+    User* members[100];
+    int memberCount;
+
+public:
+    Community(int id, const string& name, const string& description)
+        : Entity(id), name(name), description(description), memberCount(0) {}
+
+    string getName() const {
+        return name;
+    }
+
+    void setName(const string& name) {
+        this->name = name;
+    }
+
+    string getDescription() const {
+        return description;
+    }
+
+    void setDescription(const string& description) {
+        this->description = description;
+    }
+
+    void addMember(User* user) {
+        if (memberCount < 100) {
+            members[memberCount++] =
+
+Лёха Sayonara (COUT), [18.03.2025 11:47]
+user;
+        } else {
+            cout << "Достигнуто максимальное количество участников!" << endl;
+        }
+    }
+
+    int getMemberCount() const {
+        return memberCount;
+    }
+
+    User* getMember(int index) const {
+        if (index >= 0 && index < memberCount) {
+            return members[index];
+        }
+        return nullptr;
+    }
+};
+
+class Administrator : public User {
+public:
+    Administrator(int id, const string& name, const string& email)
+        : User(id, name, email) {}
+
+    void deletePost(Post* post) {
+        cout << "Пост удален администратором " << getName() << endl;
+    }
+
+    void banUser(User* user) {
+        cout << "Пользователь " << user->getName() << " заблокирован администратором " << getName() << endl;
+    }
+};
+
+int main() {
+    User user1(1, "Alice", "alice@example.com");
+    User user2(2, "Bob", "bob@example.com");
+
+    Post post1(1, "Hello, world!", &user1);
+
+    Like like1(1, &user2, &post1);
+    post1.addLike(&like1);
+
+    Comment comment1(1, "Nice post!", &user2, &post1);
+    post1.addComment(&comment1);
+
+    Community community(1, "C++ Developers", "A community for C++ enthusiasts");
+    community.addMember(&user1);
+    community.addMember(&user2);
+
+    Administrator admin(3, "Admin", "admin@example.com");
+
+    admin.deletePost(&post1);
+
+    admin.banUser(&user2);
+
+    cout << "Пост: " << post1.getText() << endl;
+    cout << "Автор: " << post1.getAuthor()->getName() << endl;
+    cout << "Лайков: " << post1.getLikeCount() << endl;
+    cout << "Комментариев: " << post1.getCommentCount() << endl;
+
+    return 0;
+}
