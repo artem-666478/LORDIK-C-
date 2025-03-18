@@ -1,0 +1,173 @@
+#include <iostream>
+using namespace std;
+
+class UIElement {
+public:
+    virtual void draw() {};
+};
+
+class UIElementButtons : public UIElement {
+public:
+    bool isFocused;
+
+    void draw() override {}
+};
+
+class UIElementComposable : public UIElement {
+public:
+    void draw() override {}
+};
+
+class Button : public UIElementButtons {
+public:
+    int size_x;
+    int size_y;
+    string text;
+    int padding_horizontal;
+
+    Button() {
+        size_x = 10;
+        size_y = 3;
+        text = "Button";
+        padding_horizontal = 1;
+    }
+
+    Button(int size_x, int size_y, string text, int padding_horizontal = 1) {
+        this->size_x = size_x + padding_horizontal;
+        this->size_y = size_y;
+        this->text = text;
+        this->padding_horizontal = padding_horizontal;
+
+        if (text.size() + padding_horizontal > size_x) {
+            this->size_x = text.size() + 3 + padding_horizontal;
+        }
+    }
+
+    void draw() override {
+        string textBuffer = this->text;
+
+        for (int i = 0; i < size_y; i++) {
+            for (int j = 0; j < size_x; j++) {
+                if (i == 0 || i == size_y - 1) {
+                    cout << '*';
+                    continue;
+                }
+
+                if (j == 0 || j == size_x - 1) {
+                    cout << '*';
+                    continue;
+                }
+
+                if (i == size_y / 2 && j > padding_horizontal && textBuffer.size() > 0) {
+                    cout << textBuffer[0];
+                    textBuffer.erase(0, 1);
+                    continue;
+                }
+
+                cout << " ";
+            }
+            cout << endl;
+        }
+    }
+};
+
+class Checkbox : public UIElement {
+public:
+    bool checked;
+    string label;
+
+    Checkbox(string label, bool checked = false) {
+        this->label = label;
+        this->checked = checked;
+    }
+
+    void draw() override {
+        cout << "[" << (checked ? "X" : " ") << "] " << label << endl;
+    }
+
+    void toggle() {
+        checked = !checked;
+    }
+};
+
+class Column : public UIElementComposable {
+public:
+    static const int MAX_COMPONENTS = 10; 
+    UIElement* components[MAX_COMPONENTS];
+    int componentCount = 0;
+
+    Column(UIElement* components[], int count) {
+        for (int i = 0; i < count; i++) {
+            this->components[i] = components[i];
+        }
+        componentCount = count;
+    }
+
+    void draw() override {
+        for (int i = 0; i < componentCount; i++) {
+            components[i]->draw();
+        }
+    }
+};
+
+class Row : public UIElementComposable {
+public:
+    static const int MAX_COMPONENTS = 10;
+    UIElement* components[MAX_COMPONENTS];
+    int componentCount = 0;
+
+    Row(UIElement* components[], int count) {
+        for (int i = 0; i < count; i++) {
+            this->components[i] = components[i];
+        }
+        componentCount = count;
+    }
+
+    void draw() override {
+        for (int i = 0; i < componentCount; i++) {
+            components[i]->draw();
+        }
+    }
+};
+
+class Window {
+public:
+    int size_x;
+    int size_y;
+    UIElement* component;
+
+    Window(int size_x, int size_y, UIElement* component) {
+        this->size_x = size_x;
+        this->size_y = size_y;
+        this->component = component;
+    }
+
+    void draw() {
+        component->draw();
+    }
+};
+
+int main() {
+    setlocale(LC_ALL, "rus");
+
+    Button button1 = Button(7, 5, "First Button");
+    Button button2 = Button(9, 5, "Second Button");
+    Button button3 = Button(11, 5, "Third Button");
+
+    Checkbox checkbox1 = Checkbox("Option 1", true);
+    Checkbox checkbox2 = Checkbox("Option 2", false);
+
+    UIElement* columnElements[] = { &button1, &button2, &button3 };
+    Column column(columnElements, 3);
+
+    UIElement* rowElements[] = { &checkbox1, &checkbox2 };
+    Row row(rowElements, 2);
+
+    Window screen(100, 100, &column);
+    screen.draw();
+
+    Window screen2(100, 100, &row);
+    screen2.draw();
+
+    return 0;
+}
