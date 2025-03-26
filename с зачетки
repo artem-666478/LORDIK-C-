@@ -1,0 +1,54 @@
+class Animal {
+protected:
+    string name;
+
+public:
+    Animal(const string& name) : name(name) {}
+    virtual void makeSound() const; 
+    virtual ~Animal() {} 
+};
+
+class Lion : public Animal {
+public:
+    Lion() : Animal("Лев") {}
+
+    void makeSound() const override {
+        cout << this->name << " рычит!" << endl;
+    }
+};
+
+class Dolphin : public Animal {
+public:
+    Dolphin() : Animal("Дельфин") {}
+
+    void makeSound() const override {
+        cout << this->name << " щебечет!" << endl;
+    }
+};
+
+class Bird : public Animal {
+public:
+    Bird(const string& name) : Animal(name) {}
+};
+
+class Tit : public Bird {
+public:
+    Tit() : Bird("Синица") {}
+
+    void makeSound() const override {
+        cout << this->name << " чирикает!" << endl; 
+    }
+};
+
+int main() {
+    setlocale(LC_ALL, "rus");
+    Lion lion;
+    Dolphin dolphin;
+    Tit tit;
+
+    lion.makeSound();
+    dolphin.makeSound();
+    tit.makeSound();
+
+    return 0;
+}
