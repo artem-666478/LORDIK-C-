@@ -1,0 +1,83 @@
+using System;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        PredictionGenerator generator = new PredictionGenerator();
+        string continueGenerating;
+
+        do
+        {
+            Console.WriteLine("Сгенерировать магическое предсказание? (да/нет)");
+            continueGenerating = Console.ReadLine()?.ToLower();
+
+            if (continueGenerating == "да")
+            {
+                string prediction = generator.GeneratePrediction();
+                Console.WriteLine(prediction);
+            }
+            else if (continueGenerating != "нет")
+            {
+                Console.WriteLine("Пожалуйста, введите 'да' или 'нет'.");
+            }
+
+        } while (continueGenerating != "нет");
+
+        Console.WriteLine("Спасибо за использование генератора предсказаний!");
+    }
+}
+
+class PredictionGenerator
+{
+    private readonly string[] beginnings = 
+    {
+        "Сегодня", "Завтра", "Через неделю", "В ближайшую полнолуние", 
+        "Когда взойдет красная луна", "Ровно в полночь", "На следующем перекрестке", 
+        "Когда ты меньше всего ожидаешь", "В день твоего рождения", 
+        "Когда встретишь черного кота", "Под знаком Водолея", 
+        "Когда ветер сменит направление", "В час великого решения", 
+        "Когда загадаешь желание", "В сумерках"
+    };
+
+    private readonly string[] actions = 
+    {
+        "ты найдешь", "ты потеряешь", "тебя ждет", "ты откроешь", 
+        "ты поймешь", "ты встретишь", "ты избежишь", "ты притянешь", 
+        "ты разгадаешь", "ты изменишь", "ты обретешь", 
+        "ты отпустишь", "ты преодолеешь", "ты создашь", 
+        "ты почувствуешь", "ты услышишь", "ты увидишь", 
+        "ты прикоснешься к", "ты раскроешь", "ты станешь частью"
+    };
+
+    private readonly string[] endings = 
+    {
+        "счастье", "тайну", "приключение", "неожиданный поворот",
+        "древний артефакт", "забытое знание", "вторую половинку",
+        "скрытую силу", "долгожданную победу", "мистический знак",
+        "испытание", "дар судьбы", "ключ от всех дверей",
+        "проклятие", "благословение луны", "следы прошлой жизни",
+        "зеркальное отражение", "голос из ниоткуда",
+        "путеводную звезду", "тень неизвестного",
+        "магический кристалл", "книгу судеб",
+        "загадочное послание", "судьбоносную встречу",
+        "дверь в другой мир"
+    };
+
+    private Random random = new Random();
+
+    public string GeneratePrediction()
+    {
+        string beginning = GetRandomElement(beginnings);
+        string action = GetRandomElement(actions);
+        string ending = GetRandomElement(endings);
+
+        return $"{beginning}, {action} {ending}.";
+    }
+
+    private string GetRandomElement(string[] array)
+    {
+        int index = random.Next(array.Length);
+        return array[index];
+    }
+}
