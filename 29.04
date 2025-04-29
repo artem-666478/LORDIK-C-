@@ -1,0 +1,75 @@
+using System;
+using System.IO;
+
+class FileMerger
+{
+    static void Main()
+    {
+        string file1Path = "file1.txt";
+        string file2Path = "file2.txt";
+        string outputPath = "merged.txt";
+
+        try
+        {
+            using (StreamWriter writer = new StreamWriter(outputPath))
+            {
+                if (File.Exists(file1Path))
+                {
+                    string[] lines1 = File.ReadAllLines(file1Path);
+                    foreach (string line in lines1)
+                    {
+                        writer.WriteLine($"[file1.txt] {line}");
+                    }
+                }
+
+                if (File.Exists(file2Path))
+                {
+                    string[] lines2 = File.ReadAllLines(file2Path);
+                    foreach (string line in lines2)
+                    {
+                        writer.WriteLine($"[file2.txt] {line}");
+                    }
+                }
+            }
+
+            Console.WriteLine($"Файлы успешно объединены в {outputPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка: {ex.Message}");
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using System;
+using System.IO;
+
+class WordCounter
+{
+    static void Main()
+    {
+        string inputPath = "input.txt";
+        string outputPath = "result.txt";
+
+        try
+        {
+            string text = File.ReadAllText(inputPath);
+            
+            string[] words = text.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+            
+            File.WriteAllText(outputPath, $"Количество слов: {words.Length}");
+            
+            Console.WriteLine($"Результат сохранен в {outputPath}");
+        }
+        catch (FileNotFoundException)
+        {
+            Console.WriteLine("Файл не найден!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка: {ex.Message}");
+        }
+    }
+}
