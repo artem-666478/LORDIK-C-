@@ -1,0 +1,58 @@
+/*
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program
+{
+    delegate List<int> FilterDelegate(List<int> list);
+
+    static List<int> GetEvenNumbers(List<int> list)
+    {
+        return list.Where(x => x % 2 == 0).ToList();
+    }
+
+    static List<int> GetPositiveNumbers(List<int> list)
+    {
+        return list.Where(x => x > 0).ToList();
+    }
+
+    static void Main()
+    {
+        List<int> numbers = new List<int> { -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5 };
+
+        FilterDelegate evenFilter = GetEvenNumbers;
+        FilterDelegate positiveFilter = GetPositiveNumbers;
+
+        List<int> evenNumbers = evenFilter(numbers);
+        List<int> positiveNumbers = positiveFilter(numbers);
+
+        Console.WriteLine("Четные числа: " + string.Join(", ", evenNumbers));
+        Console.WriteLine("Положительные числа: " + string.Join(", ", positiveNumbers));
+    }
+}
+*/
+
+/*
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program
+{
+    static void Main()
+    {
+        List<int> numbers = new List<int> { 1, 2, 3, 4, 5 };
+        int addValue = 10;
+
+        Func<List<int>, int, List<int>> addNumberToList = (list, num) =>
+        {
+            return list.Select(x => x + num).ToList();
+        };
+
+        List<int> result = addNumberToList(numbers, addValue);
+
+        Console.WriteLine("Результат: " + string.Join(", ", result));
+    }
+}
+*/
