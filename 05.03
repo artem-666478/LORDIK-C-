@@ -1,0 +1,91 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Linq;
+
+class Program
+{
+    private static List<int> numbers = new List<int>();
+    private static object lockObj = new object();
+    private static bool isRunning = true;
+    private static int lastHash = 0;
+
+    static void Main()
+    {
+        Random rnd = new Random();
+        for (int i = 0; i < 10; i++)
+        {
+            numbers.Add(rnd.Next(-100, 100));
+        }
+
+        Console.WriteLine("Исходный список:");
+        PrintList(numbers);
+
+        Thread sorting = new Thread(SortList);
+        sorting.Start();
+
+        Thread observerThread = new Thread(ObserveList);
+        observerThread.Start();
+
+        Console.WriteLine("Нажмите любую клавишу для остановки...");
+        Console.ReadKey();
+
+        isRunning = false;
+        sorting.Join();
+        observerThread.Join();
+    }
+
+    static void SortList()
+    {
+        while (isRunning)
+        {
+            lock (lockObj)
+            {
+                numbers = numbers.OrderBy(x => x).ToList();
+            }
+            Thread.Sleep(100);
+        }
+    }
+
+    static void ObserveList()
+    {
+        while (isRunning)
+        {
+            int currentHash;
+            List<int> copy;
+
+            lock (lockObj)
+            {
+                copy = new List<int>(numbers);
+                currentHash = GetListHash(copy);
+            }
+
+            if (currentHash != lastHash)
+            {
+                Console.WriteLine("Список изменился:");
+                PrintList(copy);
+                lastHash = currentHash;
+            }
+
+            Thread.Sleep(50);
+        }
+    }
+
+    static void PrintList(List<int> list)
+    {
+        Console.WriteLine(string.Join(", ", list));
+    }
+
+    static int GetListHash(List<int> list)
+    {
+        uncheck
+        {
+            int hash = 19;
+            foreach (int item in list)
+            {
+                hash = hash * 31 + item.GetHashCode();
+            }
+            return hash;
+        }
+    }
+}
