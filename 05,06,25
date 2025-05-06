@@ -1,0 +1,64 @@
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+#define MAX_FILES 100
+#define MAX_PATH_LENGTH 256
+#define MAX_LINE_LENGTH 1024
+
+void searchInFile(const char* filePath, const char* word) {
+    FILE* file = fopen(filePath, "r");
+    if (!file) {
+        cerr << "Ошибка открытия файла: " << filePath << endl;
+        return;
+    }
+
+    char line[MAX_LINE_LENGTH];
+    int line_number = 1;
+    bool found = false;
+
+    while (fgets(line, sizeof(line), file)) {
+        char* newline = strchr(line, '\n');
+        if (newline) *newline = '\0';
+
+        if (strstr(line, word)) {
+            cout << "Найдено в файле " << filePath 
+                 << " (строка " << line_number << "): " 
+                 << line << endl;
+            found = true;
+        }
+        line_number++;
+    }
+
+    if (!found) {
+        cout << "Слово '" << word << "' не найдено в файле " 
+             << filePath << endl;
+    }
+
+    fclose(file);
+}
+
+int main() {
+    char file_paths[MAX_FILES][MAX_PATH_LENGTH];
+    char word_to_search[MAX_LINE_LENGTH];
+    int file_count = 0;
+
+    cout << "Введите пути к файлам (максимум " << MAX_FILES 
+         << ", для завершения введите 'done'):" << endl;
+    
+    while (file_count < MAX_FILES) {
+        cin.getline(file_paths[file_count], MAX_PATH_LENGTH);
+        if (strcmp(file_paths[file_count], "done") == 0) break;
+        file_count++;
+    }
+
+    cout << "Введите слово для поиска: ";
+    cin.getline(word_to_search, MAX_LINE_LENGTH);
+
+    for (int i = 0; i < file_count; i++) {
+        searchInFile(file_paths[i], word_to_search);
+    }
+
+    return 0;
+}
