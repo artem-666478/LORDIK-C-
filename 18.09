@@ -1,0 +1,43 @@
+using System;
+
+public class CuckooClock1
+{
+    public static string CuckooClock(string initialTime, int n)
+    {
+        string[] parts = initialTime.Split(':');
+        int hours = int.Parse(parts[0]);
+        int minutes = int.Parse(parts[1]);
+        int count = 0;
+        
+        while (true)
+        {
+            int currentCuckoos = 0;
+            if (minutes == 0)
+            {
+                currentCuckoos = hours;
+            }
+            else if (minutes == 15 || minutes == 30 || minutes == 45)
+            {
+                currentCuckoos = 1;
+            }
+            
+            count += currentCuckoos;
+
+            if (count >= n)
+            {
+                return $"{hours:D2}:{minutes:D2}";
+            }
+            
+            minutes++;
+            if (minutes == 60)
+            {
+                minutes = 0;
+                hours++;
+                if (hours == 13)
+                {
+                    hours = 1;
+                }
+            }
+        }
+    }
+}
