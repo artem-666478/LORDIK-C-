@@ -1,0 +1,32 @@
+using System;
+using System.Text;
+
+public class Decoder 
+{
+    public static string Decode(string encodedMessage)
+    {
+        StringBuilder result = new StringBuilder();
+        foreach (char c in encodedMessage)
+        {
+            if (c == ' ')
+            {
+                result.Append(' ');
+                continue;
+            }
+            
+            if (c >= 'a' && c <= 'z')
+            {
+                char decodedChar = (char)('a' + 'z' - c);
+                result.Append(decodedChar);
+            }
+        }
+        return result.ToString();
+    }
+
+    public static void Main()
+    {
+        string encoded = "r slkv mlylwb wvxlwvh gsrh nvhhztv";
+        string decoded = Decode(encoded);
+        Console.WriteLine(decoded); 
+    }
+}
