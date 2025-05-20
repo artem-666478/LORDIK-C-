@@ -1,0 +1,39 @@
+//шо не так
+
+using System;
+using System.Collections.Generic;
+
+public class Kata
+{
+    public Dictionary<double, bool> drive(double[,] drinks, string finishedDrinking, string driveTime)
+    {
+        double totalUnits = 0;
+        for (int i = 0; i < drinks.GetLength(0); i++)
+        {
+            double abv = drinks[i, 0];
+            double volume = drinks[i, 1];
+            totalUnits += abv * volume / 1000;
+        }
+        totalUnits = Math.Round(totalUnits, 2);
+
+        TimeSpan finished = TimeSpan.Parse(finishedDrinking);
+        TimeSpan drive = TimeSpan.Parse(driveTime);
+
+        double hoursDiff;
+        if (drive > finished)
+        {
+            hoursDiff = (drive - finished).TotalHours;
+        }
+        else
+        {
+            hoursDiff = (TimeSpan.FromHours(24) - finished + drive).TotalHours;
+        }
+
+        bool canDrive = hoursDiff >= totalUnits;
+
+        string formattedUnits = totalUnits.ToString("0.##");
+        double roundedUnits = double.Parse(formattedUnits);
+
+        return new Dictionary<double, bool> { { roundedUnits, canDrive } };
+    }
+}
