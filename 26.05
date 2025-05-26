@@ -1,0 +1,21 @@
+using System;
+using System.IO;
+using System.Text.RegularExpressions;
+
+internal class Program
+{
+    private static void Main(string[] args)
+    {
+        string filePath = @"C:\Users\РПО1124\source\repos\jako\emails.txt";
+        string content = File.ReadAllText(filePath);
+
+        MatchCollection matches = Regex.Matches(content, @"[a-zA-Z0-9._-]+@mail\.ru");
+
+        Console.WriteLine($"Найдено: {matches.Count} email-адресов");
+
+        foreach (Match match in matches)
+        {
+            Console.WriteLine(match.Value);
+        }
+    }
+}
