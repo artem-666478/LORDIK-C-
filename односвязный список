@@ -1,0 +1,101 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+    
+    Node(int value) {
+        data = value;
+        next = nullptr;
+    }
+};
+
+class LinkedList {
+private:
+    Node* head;
+    
+public:
+    LinkedList() {
+        head = nullptr;
+    }
+
+    void add(int value) {
+        Node* newNode = new Node(value);
+        
+        if (head == nullptr) {
+            head = newNode;
+        } else {
+            Node* temp = head;
+            while (temp->next != nullptr) {
+                temp = temp->next;
+            }
+            temp->next = newNode;
+        }
+    }
+    
+    void addFirst(int value) {
+        Node* newNode = new Node(value);
+        newNode->next = head;
+        head = newNode;
+    }
+
+    void removeFirst() {
+        if (head == nullptr) return;
+        
+        Node* temp = head;
+        head = head->next;
+        delete temp;
+    }
+    
+    void print() {
+        Node* temp = head;
+        while (temp != nullptr) {
+            cout << temp->data << " ";
+            temp = temp->next;
+        }
+        cout << endl;
+    }
+
+    bool contains(int value) {
+        Node* temp = head;
+        while (temp != nullptr) {
+            if (temp->data == value) {
+                return true;
+            }
+            temp = temp->next;
+        }
+        return false;
+    }
+
+    void clear() {
+        while (head != nullptr) {
+            removeFirst();
+        }
+    }
+    
+    ~LinkedList() {
+        clear();
+    }
+};
+
+int main() {
+    LinkedList list;
+    
+    list.add(10);
+    list.add(20);
+    list.add(30);
+    list.addFirst(5);
+    
+    cout << "Список: ";
+    list.print();
+    
+    cout << "Есть ли 20: " << (list.contains(20) ? "да" : "нет") << endl;
+    cout << "Есть ли 100: " << (list.contains(100) ? "да" : "нет") << endl;
+    
+    list.removeFirst();
+    cout << "После удаления первого: ";
+    list.print();
+    
+    return 0;
+}
