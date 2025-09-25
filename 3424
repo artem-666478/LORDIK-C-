@@ -1,0 +1,33 @@
+7.  COUNT: Посчитай общее количество матчей, сыгранных командой.
+SELECT team_id, COUNT(*) AS total_matches
+FROM Matches
+GROUP BY team_id;
+
+
+8.  SUM: Для каждого игрока посчитай общее количество забитых голов (сумма поля goals из Lineups). Выведи имя, фамилию и общее количество голов, отсортировав по убыванию.
+SELECT player_name, player_surname, SUM(goals) AS total_goals
+FROM Lineups
+GROUP BY player_name, player_surname
+ORDER BY total_goals DESC;
+
+
+9.  AVG: Посчитай среднее количество голов, которое команда пропускала за матч (goals из Games). Округли результат до двух знаков.
+SELECT team_id, ROUND(AVG(goals_against), 2) AS avg_goals_conceded
+FROM Games
+GROUP BY team_id;
+
+
+10. GROUP BY + HAVING: Найди игроков, которые получали красную карточку (cards = 'R' или cards = 'YR') более одного раза.
+SELECT player_id, COUNT(*) AS red_card_count
+FROM Cards
+WHERE cards IN ('R', 'YR')
+GROUP BY player_id
+HAVING COUNT(*) > 1;
+
+
+11. MIN/MAX: Найди самого молодого и самого старого игрока в команде. Выведи их полные имена и даты рождения.
+SELECT player_name, player_surname, date_of_birth
+FROM Players
+WHERE date_of_birth = (SELECT MIN(date_of_birth) FROM Players)
+   OR date_of_birth = (SELECT MAX(date_of_birth) FROM Players);
+
