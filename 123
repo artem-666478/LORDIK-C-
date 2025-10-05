@@ -1,0 +1,63 @@
+#include <iostream>
+#include <unordered_map>
+#include <string>
+using namespace std;
+
+class PhoneBook {
+private:
+    unordered_map<string, string> contacts;
+
+public:
+    void addContact(const string& name, const string& phone) {
+        contacts[name] = phone;
+        cout << "Контакт '" << name << "' успешно добавлен/обновлен.\n";
+    }
+
+    void removeContact(const string& name) {
+        if (contacts.erase(name)) {
+            cout << "Контакт '" << name << "' успешно удален.\n";
+        } else {
+            cout << "Контакт '" << name << "' не найден.\n";
+        }
+    }
+
+    void findContact(const string& name) {
+        auto it = contacts.find(name);
+        if (it != contacts.end()) {
+            cout << "Найден: " << it->first << " - " << it->second << "\n";
+        } else {
+            cout << "Контакт '" << name << "' не найден.\n";
+        }
+    }
+
+    void displayAllContacts() {
+        if (contacts.empty()) {
+            cout << "Телефонная книга пуста.\n";
+            return;
+        }
+
+        cout << "\nВСЕ КОНТАКТЫ\n";
+        for (const auto& [name, phone] : contacts) {
+            cout << name << " : " << phone << "\n";
+        }
+    }
+};
+
+int main() {
+setlocale (LC_ALL, "rus");
+    PhoneBook pb;
+    
+    pb.addContact("АНЯ", "+79161734574567");
+    pb.addContact("ВАНЯ", "+79031324522233");
+    pb.addContact("ПЕТЯ", "+792456433");
+    
+    pb.findContact("АНЯ");
+    pb.findContact("ПЕТЯ");
+    
+    pb.displayAllContacts();
+    
+    pb.removeContact("ВАНЯ");
+    pb.displayAllContacts();
+
+    return 0;
+}
