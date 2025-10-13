@@ -1,0 +1,131 @@
+using System;
+using System.Data;
+using Microsoft.Data.SqlClient;
+
+string connectionString = "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=aboba;Integrated Security=True";
+SqlConnection connection = new SqlConnection(connectionString);
+
+try
+{
+    connection.Open();
+    Console.WriteLine("Подключение успешно");
+    
+    bool flag = true;
+    while (flag)
+    {
+        Console.WriteLine(@"Что вы хотите сделать?:
+1) Выбрать все из таблицы
+2) Добавить данные в таблицу
+3) ВЫХОД
+");
+        int choice = Convert.ToInt16(Console.ReadLine());
+        
+        switch (choice)
+        {
+            case 1:
+                Console.WriteLine(@"Выберите таблицу:
+1) Employees
+2) Departments
+3) Orders
+");
+                int tableChoice = Convert.ToInt16(Console.ReadLine());
+                string tableName = "";
+                
+                switch (tableChoice)
+                {
+                    case 1:
+                        tableName = "Employees";
+                        break;
+                    case 2:
+                        tableName = "Departments";
+                        break;
+                    case 3:
+                        tableName = "Orders";
+                        break;
+                }
+                
+                if (!string.IsNullOrEmpty(tableName))
+                {
+                    string sqlExpression = $"SELECT * FROM {tableName}";
+                    SqlCommand command = new SqlCommand(sqlExpression, connection);
+                    SqlDataReader reader = command.ExecuteReader();
+
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        Console.Write($"{reader.GetName(i)}\t");
+                    }
+                    Console.WriteLine();
+
+                    while (reader.Read())
+                    {
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            Console.Write($"{reader.GetValue(i)}\t");
+                        }
+                        Console.WriteLine();
+                    }
+                    reader.Close();
+                }
+                break;
+                
+            case 2:
+                Console.WriteLine(@"В какую таблицу добавить данные?
+1) Employees
+2) Departments
+3) Orders
+");
+                int addTableChoice = Convert.ToInt16(Console.ReadLine());
+                
+                switch (addTableChoice)
+                {
+                    case 1:
+                        Console.WriteLine("Введите имя сотрудника: ");
+                        string ename = Console.ReadLine();
+                        Console.WriteLine("Введите номер департамента: ");
+                        string edepid = Console.ReadLine();
+                        
+                        string sqlExpression2 = $"INSERT INTO Employees (Name, DepartmentID) VALUES ('{ename}',{edepid})";
+                        SqlCommand command2 = new SqlCommand(sqlExpression2, connection);
+                        int result1 = command2.ExecuteNonQuery();
+                        Console.WriteLine($"Добавлено {result1} записей");
+                        break;
+                        
+                    case 2:
+                        Console.WriteLine("Введите название департамента: ");
+                        string dname = Console.ReadLine();
+                        
+                        string sqlExpression3 = $"INSERT INTO Departments (DepartmentName) VALUES ('{dname}')";
+                        SqlCommand command3 = new SqlCommand(sqlExpression3, connection);
+                        int result2 = command3.ExecuteNonQuery();
+                        Console.WriteLine($"Добавлено {result2} записей");
+                        break;
+                        
+                    case 3:
+                        Console.WriteLine("Введите ID сотрудника: ");
+                        string eid = Console.ReadLine();
+                        Console.WriteLine("Введите дату заказа (гггг-мм-дд): ");
+                        string odate = Console.ReadLine();
+                        
+                        string sqlExpression4 = $"INSERT INTO Orders (EmployeeID, OrderDate) VALUES ({eid},'{odate}')";
+                        SqlCommand command4 = new SqlCommand(sqlExpression4, connection);
+                        int result3 = command4.ExecuteNonQuery();
+                        Console.WriteLine($"Добавлено {result3} записей");
+                        break;
+                }
+                break;
+                
+            case 3:
+                flag = false;
+                break;
+        }
+    }
+}
+catch(Exception ex)
+{
+    Console.WriteLine(ex.ToString());
+}
+finally
+{
+    connection.Close();
+    Console.WriteLine("БД закрыта");
+}
