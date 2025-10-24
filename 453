@@ -1,0 +1,682 @@
+using System;
+using System.Data;
+using System.Data.SQLite;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace DatabaseApp
+{
+    public partial class MainForm : Form
+    {
+        private SQLiteConnection connection;
+        private string connectionString = "Data Source=library.db;Version=3;";
+
+        private TabControl tabControl;
+        private TabPage tabAuthors;
+        private TabPage tabBooks;
+        private DataGridView dataGridViewAuthors;
+        private DataGridView dataGridViewBooks;
+        private Button btnAddAuthor, btnEditAuthor, btnDeleteAuthor;
+        private Button btnAddBook, btnEditBook, btnDeleteBook;
+
+        public MainForm()
+        {
+            InitializeComponent();
+            InitializeDatabase();
+            LoadData();
+        }
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+
+
+            this.Text = "Управление библиотекой";
+            this.Size = new Size(800, 600);
+            this.StartPosition = FormStartPosition.CenterScreen;
+
+   
+            tabControl = new TabControl();
+            tabControl.Dock = DockStyle.Fill;
+            tabControl.Location = new Point(0, 0);
+            tabControl.Size = new Size(800, 600);
+
+     
+            tabAuthors = new TabPage();
+            tabAuthors.Text = "Авторы";
+            InitializeAuthorsTab();
+
+   
+            tabBooks = new TabPage();
+            tabBooks.Text = "Книги";
+            InitializeBooksTab();
+
+            tabControl.TabPages.Add(tabAuthors);
+            tabControl.TabPages.Add(tabBooks);
+
+            this.Controls.Add(tabControl);
+            this.ResumeLayout(false);
+        }
+
+        private void InitializeAuthorsTab()
+        {
+            dataGridViewAuthors = new DataGridView();
+            dataGridViewAuthors.Location = new Point(10, 50);
+            dataGridViewAuthors.Size = new Size(760, 450);
+            dataGridViewAuthors.ReadOnly = true;
+            dataGridViewAuthors.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dataGridViewAuthors.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            btnAddAuthor = new Button();
+            btnAddAuthor.Text = "Добавить автора";
+            btnAddAuthor.Location = new Point(10, 10);
+            btnAddAuthor.Size = new Size(120, 30);
+            btnAddAuthor.Click += BtnAddAuthor_Click;
+
+            btnEditAuthor = new Button();
+            btnEditAuthor.Text = "Изменить автора";
+            btnEditAuthor.Location = new Point(140, 10);
+            btnEditAuthor.Size = new Size(120, 30);
+            btnEditAuthor.Click += BtnEditAuthor_Click;
+
+            btnDeleteAuthor = new Button();
+            btnDeleteAuthor.Text = "Удалить автора";
+            btnDeleteAuthor.Location = new Point(270, 10);
+            btnDeleteAuthor.Size = new Size(120, 30);
+            btnDeleteAuthor.Click += BtnDeleteAuthor_Click;
+
+            tabAuthors.Controls.AddRange(new Control[] {
+                dataGridViewAuthors, btnAddAuthor, btnEditAuthor, btnDeleteAuthor
+            });
+        }
+
+        private void InitializeBooksTab()
+        {
+            dataGridViewBooks = new DataGridView();
+            dataGridViewBooks.Location = new Point(10, 50);
+            dataGridViewBooks.Size = new Size(760, 450);
+            dataGridViewBooks.ReadOnly = true;
+            dataGridViewBooks.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dataGridViewBooks.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+
+            btnAddBook = new Button();
+            btnAddBook.Text = "Добавить книгу";
+            btnAddBook.Location = new Point(10, 10);
+            btnAddBook.Size = new Size(120, 30);
+            btnAddBook.Click += BtnAddBook_Click;
+
+            btnEditBook = new Button();
+            btnEditBook.Text = "Изменить книгу";
+            btnEditBook.Location = new Point(140, 10);
+            btnEditBook.Size = new Size(120, 30);
+            btnEditBook.Click += BtnEditBook_Click;
+
+            btnDeleteBook = new Button();
+            btnDeleteBook.Text = "Удалить книгу";
+            btnDeleteBook.Location = new Point(270, 10);
+            btnDeleteBook.Size = new Size(120, 30);
+            btnDeleteBook.Click += BtnDeleteBook_Click;
+
+            tabBooks.Controls.AddRange(new Control[] {
+                dataGridViewBooks, btnAddBook, btnEditBook, btnDeleteBook
+            });
+        }
+
+        private void InitializeDatabase()
+        {
+            try
+            {
+                connection = new SQLiteConnection(connectionString);
+                connection.Open();
+
+  
+                string createAuthorsTable = @"
+                    CREATE TABLE IF NOT EXISTS Authors (
+                        AuthorId INTEGER PRIMARY KEY AUTOINCREMENT,
+                        Name TEXT NOT NULL,
+                        Country TEXT,
+                        BirthYear INTEGER
+                    )";
+
+
+                string createBooksTable = @"
+                    CREATE TABLE IF NOT EXISTS Books (
+                        BookId INTEGER PRIMARY KEY AUTOINCREMENT,
+                        Title TEXT NOT NULL,
+                        AuthorId INTEGER,
+                        Year INTEGER,
+                        Price REAL,
+                        FOREIGN KEY (AuthorId) REFERENCES Authors(AuthorId)
+                    )";
+
+                using (SQLiteCommand command = new SQLiteCommand(createAuthorsTable, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+
+                using (SQLiteCommand command = new SQLiteCommand(createBooksTable, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+
+                InsertSampleData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка инициализации БД: {ex.Message}");
+            }
+        }
+
+        private void InsertSampleData()
+        {
+            string checkAuthors = "SELECT COUNT(*) FROM Authors";
+            using (SQLiteCommand command = new SQLiteCommand(checkAuthors, connection))
+            {
+                long count = (long)command.ExecuteScalar();
+                if (count == 0)
+                {
+     
+                    string insertAuthors = @"
+                        INSERT INTO Authors (Name, Country, BirthYear) VALUES 
+                        ('Лев Толстой', 'Россия', 1828),
+                        ('Фёдор Достоевский', 'Россия', 1821),
+                        ('Антон Чехов', 'Россия', 1860)";
+
+                    using (SQLiteCommand insertCommand = new SQLiteCommand(insertAuthors, connection))
+                    {
+                        insertCommand.ExecuteNonQuery();
+                    }
+                }
+            }
+
+            string checkBooks = "SELECT COUNT(*) FROM Books";
+            using (SQLiteCommand command = new SQLiteCommand(checkBooks, connection))
+            {
+                long count = (long)command.ExecuteScalar();
+                if (count == 0)
+                {
+
+                    string insertBooks = @"
+                        INSERT INTO Books (Title, AuthorId, Year, Price) VALUES 
+                        ('Война и мир', 1, 1869, 1500.00),
+                        ('Анна Каренина', 1, 1877, 1200.00),
+                        ('Преступление и наказание', 2, 1866, 1000.00),
+                        ('Вишневый сад', 3, 1904, 800.00)";
+
+                    using (SQLiteCommand insertCommand = new SQLiteCommand(insertBooks, connection))
+                    {
+                        insertCommand.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
+        private void LoadData()
+        {
+            LoadAuthors();
+            LoadBooks();
+        }
+
+        private void LoadAuthors()
+        {
+            try
+            {
+                string query = "SELECT * FROM Authors";
+                using (SQLiteDataAdapter adapter = new SQLiteDataAdapter(query, connection))
+                {
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    dataGridViewAuthors.DataSource = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки авторов: {ex.Message}");
+            }
+        }
+
+        private void LoadBooks()
+        {
+            try
+            {
+                string query = @"
+                    SELECT b.BookId, b.Title, a.Name as Author, b.Year, b.Price 
+                    FROM Books b 
+                    LEFT JOIN Authors a ON b.AuthorId = a.AuthorId";
+
+                using (SQLiteDataAdapter adapter = new SQLiteDataAdapter(query, connection))
+                {
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    dataGridViewBooks.DataSource = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки книг: {ex.Message}");
+            }
+        }
+
+        private void BtnAddAuthor_Click(object sender, EventArgs e)
+        {
+            using (var form = new AuthorForm())
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    string query = "INSERT INTO Authors (Name, Country, BirthYear) VALUES (@Name, @Country, @BirthYear)";
+                    using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Name", form.AuthorName);
+                        command.Parameters.AddWithValue("@Country", form.Country);
+                        command.Parameters.AddWithValue("@BirthYear", form.BirthYear);
+                        command.ExecuteNonQuery();
+                    }
+                    LoadAuthors();
+                }
+            }
+        }
+
+        private void BtnAddBook_Click(object sender, EventArgs e)
+        {
+            using (var form = new BookForm(connection))
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    string query = "INSERT INTO Books (Title, AuthorId, Year, Price) VALUES (@Title, @AuthorId, @Year, @Price)";
+                    using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Title", form.Title);
+                        command.Parameters.AddWithValue("@AuthorId", form.AuthorId);
+                        command.Parameters.AddWithValue("@Year", form.Year);
+                        command.Parameters.AddWithValue("@Price", form.Price);
+                        command.ExecuteNonQuery();
+                    }
+                    LoadBooks();
+                }
+            }
+        }
+
+        private void BtnDeleteAuthor_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewAuthors.CurrentRow != null)
+            {
+                int authorId = Convert.ToInt32(dataGridViewAuthors.CurrentRow.Cells["AuthorId"].Value);
+
+                string checkBooks = "SELECT COUNT(*) FROM Books WHERE AuthorId = @AuthorId";
+                using (SQLiteCommand command = new SQLiteCommand(checkBooks, connection))
+                {
+                    command.Parameters.AddWithValue("@AuthorId", authorId);
+                    long bookCount = (long)command.ExecuteScalar();
+                    
+                    if (bookCount > 0)
+                    {
+                        MessageBox.Show("Нельзя удалить автора, у которого есть книги. Сначала удалите все книги этого автора.");
+                        return;
+                    }
+                }
+
+                if (MessageBox.Show("Вы уверены, что хотите удалить этого автора?", "Подтверждение", 
+                    MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    string query = "DELETE FROM Authors WHERE AuthorId = @AuthorId";
+                    using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@AuthorId", authorId);
+                        command.ExecuteNonQuery();
+                    }
+                    LoadAuthors();
+                }
+            }
+        }
+
+        private void BtnDeleteBook_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewBooks.CurrentRow != null)
+            {
+                int bookId = Convert.ToInt32(dataGridViewBooks.CurrentRow.Cells["BookId"].Value);
+                
+                if (MessageBox.Show("Вы уверены, что хотите удалить эту книгу?", "Подтверждение", 
+                    MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    string query = "DELETE FROM Books WHERE BookId = @BookId";
+                    using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@BookId", bookId);
+                        command.ExecuteNonQuery();
+                    }
+                    LoadBooks();
+                }
+            }
+        }
+
+        private void BtnEditAuthor_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewAuthors.CurrentRow != null)
+            {
+                DataGridViewRow row = dataGridViewAuthors.CurrentRow;
+                int authorId = Convert.ToInt32(row.Cells["AuthorId"].Value);
+                string name = row.Cells["Name"].Value.ToString();
+                string country = row.Cells["Country"].Value?.ToString() ?? "";
+                int birthYear = row.Cells["BirthYear"].Value != DBNull.Value ? 
+                    Convert.ToInt32(row.Cells["BirthYear"].Value) : 0;
+
+                using (var form = new AuthorForm(name, country, birthYear))
+                {
+                    if (form.ShowDialog() == DialogResult.OK)
+                    {
+                        string query = "UPDATE Authors SET Name = @Name, Country = @Country, BirthYear = @BirthYear WHERE AuthorId = @AuthorId";
+                        using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                        {
+                            command.Parameters.AddWithValue("@Name", form.AuthorName);
+                            command.Parameters.AddWithValue("@Country", form.Country);
+                            command.Parameters.AddWithValue("@BirthYear", form.BirthYear);
+                            command.Parameters.AddWithValue("@AuthorId", authorId);
+                            command.ExecuteNonQuery();
+                        }
+                        LoadAuthors();
+                    }
+                }
+            }
+        }
+
+        private void BtnEditBook_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewBooks.CurrentRow != null)
+            {
+                DataGridViewRow row = dataGridViewBooks.CurrentRow;
+                int bookId = Convert.ToInt32(row.Cells["BookId"].Value);
+                string title = row.Cells["Title"].Value.ToString();
+                string authorName = row.Cells["Author"].Value?.ToString() ?? "";
+                int year = row.Cells["Year"].Value != DBNull.Value ? 
+                    Convert.ToInt32(row.Cells["Year"].Value) : DateTime.Now.Year;
+                decimal price = row.Cells["Price"].Value != DBNull.Value ? 
+                    Convert.ToDecimal(row.Cells["Price"].Value) : 0;
+
+
+                int authorId = GetAuthorIdByName(authorName);
+
+                using (var form = new BookForm(connection, title, authorId, year, price))
+                {
+                    if (form.ShowDialog() == DialogResult.OK)
+                    {
+                        string query = "UPDATE Books SET Title = @Title, AuthorId = @AuthorId, Year = @Year, Price = @Price WHERE BookId = @BookId";
+                        using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                        {
+                            command.Parameters.AddWithValue("@Title", form.Title);
+                            command.Parameters.AddWithValue("@AuthorId", form.AuthorId);
+                            command.Parameters.AddWithValue("@Year", form.Year);
+                            command.Parameters.AddWithValue("@Price", form.Price);
+                            command.Parameters.AddWithValue("@BookId", bookId);
+                            command.ExecuteNonQuery();
+                        }
+                        LoadBooks();
+                    }
+                }
+            }
+        }
+
+        private int GetAuthorIdByName(string authorName)
+        {
+            if (string.IsNullOrEmpty(authorName)) return 0;
+
+            string query = "SELECT AuthorId FROM Authors WHERE Name = @Name";
+            using (SQLiteCommand command = new SQLiteCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@Name", authorName);
+                var result = command.ExecuteScalar();
+                return result != null ? Convert.ToInt32(result) : 0;
+            }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            connection?.Close();
+            base.OnFormClosing(e);
+        }
+    }
+
+    public class AuthorForm : Form
+    {
+        private TextBox txtName;
+        private TextBox txtCountry;
+        private NumericUpDown numBirthYear;
+        private Button btnOK;
+        private Button btnCancel;
+
+        public string AuthorName => txtName.Text;
+        public string Country => txtCountry.Text;
+        public int BirthYear => (int)numBirthYear.Value;
+
+        public AuthorForm()
+        {
+            InitializeComponent();
+        }
+
+        public AuthorForm(string name, string country, int birthYear) : this()
+        {
+            txtName.Text = name;
+            txtCountry.Text = country;
+            numBirthYear.Value = birthYear;
+        }
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            this.Text = "Добавление/Редактирование автора";
+            this.Size = new Size(400, 200);
+            this.StartPosition = FormStartPosition.CenterParent;
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+
+    
+            var lblName = new Label { Text = "Имя автора:", Location = new Point(10, 15), Size = new Size(100, 20) };
+            txtName = new TextBox { Location = new Point(120, 12), Size = new Size(250, 20) };
+
+            var lblCountry = new Label { Text = "Страна:", Location = new Point(10, 45), Size = new Size(100, 20) };
+            txtCountry = new TextBox { Location = new Point(120, 42), Size = new Size(250, 20) };
+
+            var lblBirthYear = new Label { Text = "Год рождения:", Location = new Point(10, 75), Size = new Size(100, 20) };
+            numBirthYear = new NumericUpDown { 
+                Location = new Point(120, 72), 
+                Size = new Size(100, 20),
+                Minimum = 1000,
+                Maximum = DateTime.Now.Year,
+                Value = 1900
+            };
+
+            btnOK = new Button { 
+                Text = "OK", 
+                DialogResult = DialogResult.OK,
+                Location = new Point(120, 110),
+                Size = new Size(75, 30)
+            };
+
+            btnCancel = new Button { 
+                Text = "Отмена", 
+                DialogResult = DialogResult.Cancel,
+                Location = new Point(205, 110),
+                Size = new Size(75, 30)
+            };
+
+            btnOK.Click += BtnOK_Click;
+
+            this.Controls.AddRange(new Control[] {
+                lblName, txtName,
+                lblCountry, txtCountry,
+                lblBirthYear, numBirthYear,
+                btnOK, btnCancel
+            });
+
+            this.AcceptButton = btnOK;
+            this.CancelButton = btnCancel;
+            this.ResumeLayout(false);
+        }
+
+        private void BtnOK_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtName.Text))
+            {
+                MessageBox.Show("Введите имя автора");
+                return;
+            }
+            DialogResult = DialogResult.OK;
+            Close();
+        }
+    }
+    public class BookForm : Form
+    {
+        private SQLiteConnection connection;
+        private TextBox txtTitle;
+        private ComboBox comboAuthor;
+        private NumericUpDown numYear;
+        private NumericUpDown numPrice;
+        private Button btnOK;
+        private Button btnCancel;
+
+        public string Title => txtTitle.Text;
+        public int AuthorId => comboAuthor.SelectedValue != null ? (int)comboAuthor.SelectedValue : 0;
+        public int Year => (int)numYear.Value;
+        public decimal Price => numPrice.Value;
+
+        public BookForm(SQLiteConnection conn)
+        {
+            connection = conn;
+            InitializeComponent();
+            LoadAuthors();
+        }
+
+        public BookForm(SQLiteConnection conn, string title, int authorId, int year, decimal price) : this(conn)
+        {
+            txtTitle.Text = title;
+            numYear.Value = year;
+            numPrice.Value = price;
+            
+            if (authorId > 0)
+            {
+                foreach (DataRowView item in comboAuthor.Items)
+                {
+                    if (Convert.ToInt32(item["AuthorId"]) == authorId)
+                    {
+                        comboAuthor.SelectedItem = item;
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            this.Text = "Добавление/Редактирование книги";
+            this.Size = new Size(400, 250);
+            this.StartPosition = FormStartPosition.CenterParent;
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+
+            var lblTitle = new Label { Text = "Название книги:", Location = new Point(10, 15), Size = new Size(100, 20) };
+            txtTitle = new TextBox { Location = new Point(120, 12), Size = new Size(250, 20) };
+
+            var lblAuthor = new Label { Text = "Автор:", Location = new Point(10, 45), Size = new Size(100, 20) };
+            comboAuthor = new ComboBox { 
+                Location = new Point(120, 42), 
+                Size = new Size(250, 20),
+                DropDownStyle = ComboBoxStyle.DropDownList
+            };
+
+            var lblYear = new Label { Text = "Год издания:", Location = new Point(10, 75), Size = new Size(100, 20) };
+            numYear = new NumericUpDown { 
+                Location = new Point(120, 72), 
+                Size = new Size(100, 20),
+                Minimum = 1000,
+                Maximum = DateTime.Now.Year,
+                Value = DateTime.Now.Year
+            };
+
+            var lblPrice = new Label { Text = "Цена:", Location = new Point(10, 105), Size = new Size(100, 20) };
+            numPrice = new NumericUpDown { 
+                Location = new Point(120, 102), 
+                Size = new Size(100, 20),
+                Minimum = 0,
+                Maximum = 100000,
+                DecimalPlaces = 2
+            };
+
+            btnOK = new Button { 
+                Text = "OK", 
+                DialogResult = DialogResult.OK,
+                Location = new Point(120, 140),
+                Size = new Size(75, 30)
+            };
+
+            btnCancel = new Button { 
+                Text = "Отмена", 
+                DialogResult = DialogResult.Cancel,
+                Location = new Point(205, 140),
+                Size = new Size(75, 30)
+            };
+
+            btnOK.Click += BtnOK_Click;
+
+            this.Controls.AddRange(new Control[] {
+                lblTitle, txtTitle,
+                lblAuthor, comboAuthor,
+                lblYear, numYear,
+                lblPrice, numPrice,
+                btnOK, btnCancel
+            });
+
+            this.AcceptButton = btnOK;
+            this.CancelButton = btnCancel;
+            this.ResumeLayout(false);
+        }
+
+        private void LoadAuthors()
+        {
+            try
+            {
+                string query = "SELECT AuthorId, Name FROM Authors";
+                using (SQLiteDataAdapter adapter = new SQLiteDataAdapter(query, connection))
+                {
+                    var dt = new DataTable();
+                    adapter.Fill(dt);
+                    comboAuthor.DataSource = dt;
+                    comboAuthor.DisplayMember = "Name";
+                    comboAuthor.ValueMember = "AuthorId";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки авторов: {ex.Message}");
+            }
+        }
+
+        private void BtnOK_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtTitle.Text))
+            {
+                MessageBox.Show("Введите название книги");
+                return;
+            }
+            if (comboAuthor.SelectedValue == null)
+            {
+                MessageBox.Show("Выберите автора");
+                return;
+            }
+            DialogResult = DialogResult.OK;
+            Close();
+        }
+    }
+
+    internal static class Program
+    {
+        [STAThread]
+        static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new MainForm());
+        }
+    }
+}
