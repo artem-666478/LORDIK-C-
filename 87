@@ -1,0 +1,373 @@
+using System;
+using System.Data;
+using System.Data.SQLite;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace ShopApp
+{
+    public partial class MainForm : Form
+    {
+        private SQLiteConnection connection;
+        private DataGridView dgvEmployees, dgvProducts, dgvPurchases;
+
+        public MainForm()
+        {
+            InitializeComponent();
+            DatabaseManager.InitializeDatabase();
+            connection = new SQLiteConnection("Data Source=shop.db;Version=3;");
+            connection.Open();
+            LoadData();
+        }
+
+        private void InitializeComponent()
+        {
+            this.Size = new Size(1000, 600);
+            this.Text = "Магазин - Управление базой данных";
+
+            var tabControl = new TabControl { Dock = DockStyle.Fill };
+
+            var tabEmployees = new TabPage("Сотрудники");
+            dgvEmployees = new DataGridView { Dock = DockStyle.Fill, Location = new Point(0, 40) };
+            var btnAddEmp = new Button { Text = "Добавить", Location = new Point(10, 10), Size = new Size(80, 25) };
+            var btnEditEmp = new Button { Text = "Изменить", Location = new Point(100, 10), Size = new Size(80, 25) };
+            var btnDeleteEmp = new Button { Text = "Удалить", Location = new Point(190, 10), Size = new Size(80, 25) };
+            
+            btnAddEmp.Click += (s,e) => ShowEmployeeForm();
+            btnEditEmp.Click += (s,e) => EditEmployee();
+            btnDeleteEmp.Click += (s,e) => DeleteEmployee();
+            
+            tabEmployees.Controls.AddRange(new Control[]{ dgvEmployees, btnAddEmp, btnEditEmp, btnDeleteEmp });
+
+            var tabProducts = new TabPage("Товары");
+            dgvProducts = new DataGridView { Dock = DockStyle.Fill, Location = new Point(0, 40) };
+            var btnAddProd = new Button { Text = "Добавить", Location = new Point(10, 10), Size = new Size(80, 25) };
+            var btnEditProd = new Button { Text = "Изменить", Location = new Point(100, 10), Size = new Size(80, 25) };
+            var btnDeleteProd = new Button { Text = "Удалить", Location = new Point(190, 10), Size = new Size(80, 25) };
+            
+            btnAddProd.Click += (s,e) => ShowProductForm();
+            btnEditProd.Click += (s,e) => EditProduct();
+            btnDeleteProd.Click += (s,e) => DeleteProduct();
+            
+            tabProducts.Controls.AddRange(new Control[]{ dgvProducts, btnAddProd, btnEditProd, btnDeleteProd });
+
+            var tabPurchases = new TabPage("Покупки");
+            dgvPurchases = new DataGridView { Dock = DockStyle.Fill, Location = new Point(0, 40) };
+            var btnAddPur = new Button { Text = "Оформить", Location = new Point(10, 10), Size = new Size(80, 25) };
+            var btnDeletePur = new Button { Text = "Удалить", Location = new Point(100, 10), Size = new Size(80, 25) };
+            
+            btnAddPur.Click += (s,e) => ShowPurchaseForm();
+            btnDeletePur.Click += (s,e) => DeletePurchase();
+            
+            tabPurchases.Controls.AddRange(new Control[]{ dgvPurchases, btnAddPur, btnDeletePur });
+
+            tabControl.TabPages.AddRange(new TabPage[] { tabEmployees, tabProducts, tabPurchases });
+            this.Controls.Add(tabControl);
+        }
+
+        private void LoadData()
+        {
+
+            var da1 = new SQLiteDataAdapter("SELECT * FROM Employees", connection);
+            var dt1 = new DataTable();
+            da1.Fill(dt1);
+            dgvEmployees.DataSource = dt1;
+
+            
+            var da2 = new SQLiteDataAdapter("SELECT * FROM Products", connection);
+            var dt2 = new DataTable();
+            da2.Fill(dt2);
+            dgvProducts.DataSource = dt2;
+
+            var da3 = new SQLiteDataAdapter(@"
+                SELECT p.PurchaseId, e.Name as Employee, pr.ProductName as Product, 
+                       p.Quantity, p.TotalPrice, p.PurchaseDate 
+                FROM Purchases p
+                JOIN Employees e ON p.EmployeeId = e.EmployeeId
+                JOIN Products pr ON p.ProductId = pr.ProductId", connection);
+            var dt3 = new DataTable();
+            da3.Fill(dt3);
+            dgvPurchases.DataSource = dt3;
+        }
+
+        private void ShowEmployeeForm(bool isEdit = false)
+        {
+            using (var form = new Form { 
+                Text = isEdit ? "Редактировать сотрудника" : "Добавить сотрудника", 
+                Size = new Size(300, 200) 
+            })
+            {
+                var txtName = new TextBox { Location = new Point(100, 20), Width = 150 };
+                var txtPosition = new TextBox { Location = new Point(100, 50), Width = 150 };
+                var numSalary = new NumericUpDown { Location = new Point(100, 80), Width = 150, DecimalPlaces = 2 };
+                var btnOK = new Button { Text = "OK", DialogResult = DialogResult.OK, Location = new Point(100, 120) };
+
+                if (isEdit && dgvEmployees.CurrentRow != null)
+                {
+                    var row = dgvEmployees.CurrentRow;
+                    txtName.Text = row.Cells["Name"].Value.ToString();
+                    txtPosition.Text = row.Cells["Position"].Value.ToString();
+                    numSalary.Value = Convert.ToDecimal(row.Cells["Salary"].Value);
+                }
+
+                form.Controls.AddRange(new Control[] {
+                    new Label { Text = "Имя:", Location = new Point(20, 20) }, txtName,
+                    new Label { Text = "Должность:", Location = new Point(20, 50) }, txtPosition,
+                    new Label { Text = "Зарплата:", Location = new Point(20, 80) }, numSalary,
+                    btnOK
+                });
+
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    string query = isEdit ? 
+                        "UPDATE Employees SET Name=@n, Position=@p, Salary=@s WHERE EmployeeId=@id" :
+                        "INSERT INTO Employees (Name, Position, Salary) VALUES (@n, @p, @s)";
+                    
+                    var cmd = new SQLiteCommand(query, connection);
+                    cmd.Parameters.AddWithValue("@n", txtName.Text);
+                    cmd.Parameters.AddWithValue("@p", txtPosition.Text);
+                    cmd.Parameters.AddWithValue("@s", numSalary.Value);
+                    if (isEdit) cmd.Parameters.AddWithValue("@id", dgvEmployees.CurrentRow.Cells["EmployeeId"].Value);
+                    
+                    cmd.ExecuteNonQuery();
+                    LoadData();
+                }
+            }
+        }
+
+        private void ShowProductForm(bool isEdit = false)
+        {
+            using (var form = new Form { 
+                Text = isEdit ? "Редактировать товар" : "Добавить товар", 
+                Size = new Size(300, 250) 
+            })
+            {
+                var txtName = new TextBox { Location = new Point(100, 20), Width = 150 };
+                var txtCategory = new TextBox { Location = new Point(100, 50), Width = 150 };
+                var numPrice = new NumericUpDown { Location = new Point(100, 80), Width = 150, DecimalPlaces = 2 };
+                var numStock = new NumericUpDown { Location = new Point(100, 110), Width = 150 };
+                var btnOK = new Button { Text = "OK", DialogResult = DialogResult.OK, Location = new Point(100, 150) };
+
+                if (isEdit && dgvProducts.CurrentRow != null)
+                {
+                    var row = dgvProducts.CurrentRow;
+                    txtName.Text = row.Cells["ProductName"].Value.ToString();
+                    txtCategory.Text = row.Cells["Category"].Value.ToString();
+                    numPrice.Value = Convert.ToDecimal(row.Cells["Price"].Value);
+                    numStock.Value = Convert.ToInt32(row.Cells["StockQuantity"].Value);
+                }
+
+                form.Controls.AddRange(new Control[] {
+                    new Label { Text = "Название:", Location = new Point(20, 20) }, txtName,
+                    new Label { Text = "Категория:", Location = new Point(20, 50) }, txtCategory,
+                    new Label { Text = "Цена:", Location = new Point(20, 80) }, numPrice,
+                    new Label { Text = "Количество:", Location = new Point(20, 110) }, numStock,
+                    btnOK
+                });
+
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    string query = isEdit ? 
+                        "UPDATE Products SET ProductName=@n, Category=@c, Price=@p, StockQuantity=@s WHERE ProductId=@id" :
+                        "INSERT INTO Products (ProductName, Category, Price, StockQuantity) VALUES (@n, @c, @p, @s)";
+                    
+                    var cmd = new SQLiteCommand(query, connection);
+                    cmd.Parameters.AddWithValue("@n", txtName.Text);
+                    cmd.Parameters.AddWithValue("@c", txtCategory.Text);
+                    cmd.Parameters.AddWithValue("@p", numPrice.Value);
+                    cmd.Parameters.AddWithValue("@s", (int)numStock.Value);
+                    if (isEdit) cmd.Parameters.AddWithValue("@id", dgvProducts.CurrentRow.Cells["ProductId"].Value);
+                    
+                    cmd.ExecuteNonQuery();
+                    LoadData();
+                }
+            }
+        }
+
+        private void ShowPurchaseForm()
+        {
+            using (var form = new Form { 
+                Text = "Оформить покупку", 
+                Size = new Size(300, 200) 
+            })
+            {
+                var cmbEmployee = new ComboBox { Location = new Point(100, 20), Width = 150 };
+                var cmbProduct = new ComboBox { Location = new Point(100, 50), Width = 150 };
+                var numQuantity = new NumericUpDown { Location = new Point(100, 80), Width = 150, Minimum = 1 };
+                var lblTotal = new Label { Text = "Итого: 0 руб", Location = new Point(100, 110), Width = 150 };
+                var btnOK = new Button { Text = "Оформить", DialogResult = DialogResult.OK, Location = new Point(100, 140) };
+
+                var daEmp = new SQLiteDataAdapter("SELECT EmployeeId, Name FROM Employees", connection);
+                var dtEmp = new DataTable();
+                daEmp.Fill(dtEmp);
+                cmbEmployee.DataSource = dtEmp;
+                cmbEmployee.DisplayMember = "Name";
+                cmbEmployee.ValueMember = "EmployeeId";
+
+                var daProd = new SQLiteDataAdapter("SELECT ProductId, ProductName, Price FROM Products WHERE StockQuantity > 0", connection);
+                var dtProd = new DataTable();
+                daProd.Fill(dtProd);
+                cmbProduct.DataSource = dtProd;
+                cmbProduct.DisplayMember = "ProductName";
+                cmbProduct.ValueMember = "ProductId";
+
+                EventHandler CalculateTotal = (s, e) => {
+                    if (cmbProduct.SelectedValue != null)
+                    {
+                        var price = Convert.ToDecimal((cmbProduct.SelectedItem as DataRowView)?["Price"] ?? 0);
+                        lblTotal.Text = $"Итого: {price * numQuantity.Value} руб";
+                    }
+                };
+
+                cmbProduct.SelectedIndexChanged += CalculateTotal;
+                numQuantity.ValueChanged += CalculateTotal;
+
+                form.Controls.AddRange(new Control[] {
+                    new Label { Text = "Сотрудник:", Location = new Point(20, 20) }, cmbEmployee,
+                    new Label { Text = "Товар:", Location = new Point(20, 50) }, cmbProduct,
+                    new Label { Text = "Количество:", Location = new Point(20, 80) }, numQuantity,
+                    lblTotal, btnOK
+                });
+
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+
+                    var priceCmd = new SQLiteCommand("SELECT Price FROM Products WHERE ProductId=@id", connection);
+                    priceCmd.Parameters.AddWithValue("@id", cmbProduct.SelectedValue);
+                    decimal price = Convert.ToDecimal(priceCmd.ExecuteScalar());
+                    decimal total = price * numQuantity.Value;
+
+                 
+                    var cmd = new SQLiteCommand(@"
+                        INSERT INTO Purchases (EmployeeId, ProductId, Quantity, TotalPrice, PurchaseDate) 
+                        VALUES (@e, @p, @q, @t, datetime('now'))", connection);
+                    cmd.Parameters.AddWithValue("@e", cmbEmployee.SelectedValue);
+                    cmd.Parameters.AddWithValue("@p", cmbProduct.SelectedValue);
+                    cmd.Parameters.AddWithValue("@q", (int)numQuantity.Value);
+                    cmd.Parameters.AddWithValue("@t", total);
+                    cmd.ExecuteNonQuery();
+
+                    var updateCmd = new SQLiteCommand("UPDATE Products SET StockQuantity = StockQuantity - @q WHERE ProductId=@id", connection);
+                    updateCmd.Parameters.AddWithValue("@q", (int)numQuantity.Value);
+                    updateCmd.Parameters.AddWithValue("@id", cmbProduct.SelectedValue);
+                    updateCmd.ExecuteNonQuery();
+
+                    LoadData();
+                }
+            }
+        }
+
+        private void EditEmployee() => ShowEmployeeForm(true);
+        private void EditProduct() => ShowProductForm(true);
+
+        private void DeleteEmployee()
+        {
+            if (dgvEmployees.CurrentRow != null && 
+                MessageBox.Show("Удалить сотрудника?", "Подтверждение", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                var id = dgvEmployees.CurrentRow.Cells["EmployeeId"].Value;
+                new SQLiteCommand($"DELETE FROM Employees WHERE EmployeeId={id}", connection).ExecuteNonQuery();
+                LoadData();
+            }
+        }
+
+        private void DeleteProduct()
+        {
+            if (dgvProducts.CurrentRow != null && 
+                MessageBox.Show("Удалить товар?", "Подтверждение", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                var id = dgvProducts.CurrentRow.Cells["ProductId"].Value;
+                new SQLiteCommand($"DELETE FROM Products WHERE ProductId={id}", connection).ExecuteNonQuery();
+                LoadData();
+            }
+        }
+
+        private void DeletePurchase()
+        {
+            if (dgvPurchases.CurrentRow != null && 
+                MessageBox.Show("Удалить запись о покупке?", "Подтверждение", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                var id = dgvPurchases.CurrentRow.Cells["PurchaseId"].Value;
+                new SQLiteCommand($"DELETE FROM Purchases WHERE PurchaseId={id}", connection).ExecuteNonQuery();
+                LoadData();
+            }
+        }
+    }
+
+    public static class DatabaseManager
+    {
+        public static void InitializeDatabase()
+        {
+            using var connection = new SQLiteConnection("Data Source=shop.db;Version=3;");
+            connection.Open();
+
+            CreateTables(connection);
+            
+            InsertSampleData(connection);
+        }
+
+        private static void CreateTables(SQLiteConnection connection)
+        {
+            var cmd1 = new SQLiteCommand(@"
+                CREATE TABLE IF NOT EXISTS Employees (
+                    EmployeeId INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Name TEXT NOT NULL,
+                    Position TEXT,
+                    Salary REAL)", connection);
+            cmd1.ExecuteNonQuery();
+
+            var cmd2 = new SQLiteCommand(@"
+                CREATE TABLE IF NOT EXISTS Products (
+                    ProductId INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ProductName TEXT NOT NULL,
+                    Category TEXT,
+                    Price REAL,
+                    StockQuantity INTEGER)", connection);
+            cmd2.ExecuteNonQuery();
+
+            var cmd3 = new SQLiteCommand(@"
+                CREATE TABLE IF NOT EXISTS Purchases (
+                    PurchaseId INTEGER PRIMARY KEY AUTOINCREMENT,
+                    EmployeeId INTEGER,
+                    ProductId INTEGER,
+                    Quantity INTEGER,
+                    TotalPrice REAL,
+                    PurchaseDate TEXT,
+                    FOREIGN KEY (EmployeeId) REFERENCES Employees(EmployeeId),
+                    FOREIGN KEY (ProductId) REFERENCES Products(ProductId))", connection);
+            cmd3.ExecuteNonQuery();
+        }
+
+        private static void InsertSampleData(SQLiteConnection connection)
+        {
+            var checkCmd = new SQLiteCommand("SELECT COUNT(*) FROM Employees", connection);
+            if (Convert.ToInt32(checkCmd.ExecuteScalar()) == 0)
+            {
+                new SQLiteCommand(@"
+                    INSERT INTO Employees (Name, Position, Salary) VALUES 
+                    ('Иван Петров', 'Кассир', 45000),
+                    ('Мария Сидорова', 'Администратор', 60000),
+                    ('Алексей Козлов', 'Менеджер', 55000)", connection).ExecuteNonQuery();
+
+                new SQLiteCommand(@"
+                    INSERT INTO Products (ProductName, Category, Price, StockQuantity) VALUES 
+                    ('Хлеб', 'Продукты', 50.0, 100),
+                    ('Молоко', 'Продукты', 80.0, 50),
+                    ('Мыло', 'Бытовая химия', 40.0, 30),
+                    ('Шоколад', 'Продукты', 60.0, 80)",
+                    connection).ExecuteNonQuery();
+            }
+        }
+    }
+
+    internal static class Program
+    {
+        [STAThread]
+        static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new MainForm());
+        }
+    }
+}
