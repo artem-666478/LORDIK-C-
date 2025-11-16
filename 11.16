@@ -1,0 +1,330 @@
+задача 1
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        Console.WriteLine("=== Задача №1: Сумма квадратов с параллельными задачами ===");
+        
+        var numbers = Enumerable.Range(1, 100).ToList();
+        numbers.Add(-5);
+        
+        try
+        {
+            int chunkSize = numbers.Count / 4;
+            var tasks = new List<Task<long>>();
+            
+            Console.WriteLine($"Разделяем список на 4 части по ~{chunkSize} элементов");
+            
+            for (int i = 0; i < 4; i++)
+            {
+                int start = i * chunkSize;
+                int end = (i == 3) ? numbers.Count : start + chunkSize;
+                var chunk = numbers.GetRange(start, end - start);
+                
+                Console.WriteLine($"Часть {i + 1}: элементы {start}-{end - 1}");
+                
+                tasks.Add(Task.Run(() => ProcessChunk(chunk)));
+            }
+            
+            var results = await Task.WhenAll(tasks);
+            long totalSum = results.Sum();
+            
+            Console.WriteLine($"\nСумма квадратов всех положительных чисел: {totalSum}");
+            
+            long expected = Enumerable.Range(1, 100).Select(x => (long)x * x).Sum();
+            Console.WriteLine($"Ожидаемая сумма (1-100): {expected}");
+            Console.WriteLine($"Результат корректный: {totalSum == expected}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка: {ex.Message}");
+        }
+    }
+    
+    static long ProcessChunk(List<int> chunk)
+    {
+        long sum = 0;
+        foreach (var num in chunk)
+        {
+            if (num < 0)
+            {
+                Console.WriteLine($"Игнорируем отрицательное число: {num}");
+                continue;
+            }
+            sum += (long)num * num;
+        }
+        return sum;
+    }
+}
+
+задача 2
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        Console.WriteLine("=== Задача №2: Параллельная загрузка с серверов ===");
+        
+        var cts = new CancellationTokenSource();
+        cts.CancelAfter(2500);
+        
+        try
+        {
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            
+            Console.WriteLine("Запуск загрузки с 3 серверов...");
+            
+            var tasks = new[]
+            {
+                LoadDataFromServer("Сервер1", 1000, cts.Token),
+                LoadDataFromServer("Сервер2", 2000, cts.Token),
+                LoadDataFromServer("Сервер3", 3000, cts.Token)
+            };
+            
+            var results = await Task.WhenAll(tasks);
+            
+            stopwatch.Stop();
+            
+            Console.WriteLine("\nРезультаты загрузки:");
+            foreach (var result in results)
+            {
+                Console.WriteLine($"  ✓ {result}");
+            }
+            
+            Console.WriteLine($"\nОбщее время выполнения: {stopwatch.ElapsedMilliseconds}мс");
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine("\nЗагрузка отменена: превышено время ожидания (2.5с)");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"\nОшибка: {ex.Message}");
+        }
+    }
+    
+    static async Task<string> LoadDataFromServer(string serverName, int delay, CancellationToken token)
+    {
+        Console.WriteLine($"  {serverName}: начинаю загрузку ({delay}мс)");
+        await Task.Delay(delay, token);
+        return $"{serverName}: данные загружены за {delay}мс";
+    }
+}
+
+задача 3
+using System;
+using System.Collections.Generic;
+using System.Threading;
+
+class Program
+{
+    private static int counter = 0;
+    private static object lockObject = new object();
+    
+    static void Main(string[] args)
+    {
+        Console.WriteLine("=== Задача №3: Многопоточный счетчик ===");
+        Console.WriteLine("Запуск 5 потоков, каждый делает 1000 инкрементов");
+        
+        var threads = new List<Thread>();
+        
+        for (int i = 0; i < 5; i++)
+        {
+            int threadNumber = i + 1;
+            var thread = new Thread(() => IncrementCounter(threadNumber));
+            threads.Add(thread);
+            thread.Start();
+        }
+        
+        foreach (var thread in threads)
+        {
+            thread.Join();
+        }
+        
+        Console.WriteLine($"\nФинальное значение счетчика: {counter}");
+        Console.WriteLine($"Ожидаемое значение: 5000");
+        Console.WriteLine($"Результат корректный: {counter == 5000}");
+    }
+    
+    static void IncrementCounter(int threadNumber)
+    {
+        for (int i = 0; i < 1000; i++)
+        {
+            lock (lockObject)
+            {
+                counter++;
+            }
+            
+            Thread.Sleep(1);
+        }
+        
+        Console.WriteLine($"Поток {threadNumber} завершил работу");
+    }
+}
+
+задача 4
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Console.WriteLine("=== Задача №4: Обработка результатов задач с ContinueWith ===");
+        
+        var numbers = new[] { 1, -4, 9 };
+        var tasks = new List<Task<double>>();
+        var successfulResults = new List<double>();
+        var exceptions = new List<Exception>();
+        
+        Console.WriteLine("Вычисляем квадратные корни для чисел: " + string.Join(", ", numbers));
+        
+        foreach (var number in numbers)
+        {
+            var task = Task.Run(() =>
+            {
+                Console.WriteLine($"  Вычисляю корень из {number}...");
+                
+                if (number < 0)
+                    throw new ArgumentException($"Нельзя вычислить корень из отрицательного числа: {number}");
+                
+                return Math.Sqrt(number);
+            });
+            
+            task.ContinueWith(t =>
+            {
+                if (t.IsCompletedSuccessfully)
+                {
+                    lock (successfulResults)
+                    {
+                        successfulResults.Add(t.Result);
+                    }
+                    Console.WriteLine($"  ✓ Успешно вычислен корень из {number}");
+                }
+            }, TaskContinuationOptions.OnlyOnRanToCompletion);
+            
+            task.ContinueWith(t =>
+            {
+                lock (exceptions)
+                {
+                    exceptions.Add(t.Exception.InnerException);
+                }
+                Console.WriteLine($"  ✗ Ошибка при вычислении корня из {number}");
+            }, TaskContinuationOptions.OnlyOnFaulted);
+            
+            tasks.Add(task);
+        }
+        
+        Task.WaitAll(tasks.ToArray());
+        
+        Console.WriteLine("\n=== РЕЗУЛЬТАТЫ ===");
+        
+        Console.WriteLine("Успешные результаты:");
+        if (successfulResults.Count > 0)
+        {
+            foreach (var result in successfulResults)
+            {
+                Console.WriteLine($"  √{result * result} = {result:F2}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("  Нет успешных результатов");
+        }
+        
+        Console.WriteLine("\nОшибки:");
+        if (exceptions.Count > 0)
+        {
+            foreach (var ex in exceptions)
+            {
+                Console.WriteLine($"  {ex.Message}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("  Ошибок нет");
+        }
+    }
+}
+
+задача 5
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        Console.WriteLine("=== Задача №5: Долгие операции с отменой ===");
+        Console.WriteLine("Запуск 2 задач, каждая делает 10 итераций по 500мс");
+        Console.WriteLine("Отмена через 3 секунды (должны успеть ~6 итераций)\n");
+        
+        var cts = new CancellationTokenSource();
+        cts.CancelAfter(3000);
+        
+        var tasks = new[]
+        {
+            LongOperation("Задача 1", cts.Token),
+            LongOperation("Задача 2", cts.Token)
+        };
+        
+        try
+        {
+            await Task.WhenAll(tasks);
+            Console.WriteLine("\n✓ Все задачи завершены успешно");
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine("\n✗ Задачи были отменены по таймауту");
+        }
+        
+        Console.WriteLine("\n=== ИТОГИ ===");
+        foreach (var task in tasks)
+        {
+            if (task.IsCompletedSuccessfully)
+            {
+                Console.WriteLine($"{task.Result.Item1}: завершено {task.Result.Item2} итераций");
+            }
+        }
+    }
+    
+    static async Task<(string, int)> LongOperation(string taskName, CancellationToken token)
+    {
+        int completedIterations = 0;
+        
+        try
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                token.ThrowIfCancellationRequested();
+                
+                await Task.Delay(500, token);
+                completedIterations++;
+                
+                Console.WriteLine($"{taskName}: завершена итерация {i + 1}");
+            }
+            
+            Console.WriteLine($"{taskName}:  все 10 итераций завершены");
+            return (taskName, completedIterations);
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine($"{taskName}:  отменена после {completedIterations} итераций");
+            return (taskName, completedIterations);
+        }
+    }
+}
+
+
