@@ -1,0 +1,49 @@
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int rows = 4;
+        int cols = 5;
+        
+        int[,] matrix = new int[rows, cols];
+        
+        FillMatrix(matrix);
+        PrintMatrix(matrix);
+    }
+    
+    static void FillMatrix(int[,] matrix)
+    {
+        Random random = new Random();
+        
+        int rows = matrix.GetLength(0);
+        int cols = matrix.GetLength(1);
+        
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                matrix[i, j] = random.Next(1, 101);
+            }
+        }
+    }
+    
+    static void PrintMatrix(int[,] matrix)
+    {
+        int rows = matrix.GetLength(0);
+        int cols = matrix.GetLength(1);
+        
+        Console.WriteLine("Матрица 4x5:");
+        Console.WriteLine(new string('-', 30));
+        
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                Console.Write(matrix[i, j].ToString().PadLeft(4));
+            }
+            Console.WriteLine();
+        }
+    }
+}
