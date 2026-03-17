@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JQuery Selectors Example</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        p { background-color: white; }
+    </style>
+</head>
+<body>
+<p id="first">Первый абзац</p>
+<p class="highlight">Второй абзац</p>
+<p>Третий абзац</p>
+<script>
+$(document).ready(function(){
+    // Выбираем элемент по ID и добавляем текст
+    $('#first').text($('#first').text() + ' (выбран по ID)');
+    
+    // Меняем фон всех элементов с указанным классом
+    $('.highlight').css('background', 'yellow');
+    
+    // Добавляем отступ ко всем параграфам
+    $('p').css('margin', '10px');
+});
+</script>
+</body>
+</html>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Color Switcher</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #square {
+            width: 100px;
+            height: 100px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<button id="changeColorBtn">Изменить цвет</button>
+<div id="square"></div>
+<script>
+$(document).ready(function(){
+    var colors = ['red', 'green'];
+    let currentIndex = 0;
+    
+    $('#changeColorBtn').click(function(){
+        $('#square').css('background-color', colors[currentIndex]);
+        currentIndex = (currentIndex + 1) % colors.length;
+    });
+});
+</script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Toggle Content Visibility</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #hiddenContent { display: none; }
+    </style>
+</head>
+<body>
+<button id="toggleButton">Читать далее</button>
+<div id="hiddenContent">Это дополнительный текст.</div>
+<script>
+$(document).ready(function(){
+    $('#toggleButton').click(function(){
+        if ($('#hiddenContent').is(':visible')) {
+            $('#hiddenContent').slideUp();
+        } else {
+            $('#hiddenContent').slideDown();
+        }
+    });
+});
+</script>
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Input Preview</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<input type="text" id="liveInput"/>
+<p id="outputText"></p>
+<script>
+$(document).ready(function(){
+    $('#liveInput').on('input', function(){
+        $('#outputText').text($(this).val());
+    });
+});
+</script>
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Active List Item</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        li.active { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+<ul>
+    <li>Элемент 1</li>
+    <li>Элемент 2</li>
+    <li>Элемент 3</li>
+    <li>Элемент 4</li>
+    <li>Элемент 5</li>
+</ul>
+<script>
+$(document).ready(function(){
+    $('ul > li').click(function(){
+        $('ul > li').removeClass('active'); // Убрать активный класс у всех
+        $(this).addClass('active');          // Установить активный класс для текущего
+    });
+});
+</script>
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Deletion</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h3>Список задач:</h3>
+<ul id="taskList"></ul>
+<button id="addTaskBtn">Добавить задачу</button>
+<script>
+$(document).ready(function(){
+    $('#addTaskBtn').click(function(){
+        let newItem = '<li>Новая задача <button class="deleteBtn">Удалить</button></li>';
+        $('#taskList').append(newItem);
+        
+        // Обработчик удаления
+        $('.deleteBtn').click(function(){
+            $(this).closest('li').remove(); // Найти ближайший родительский LI и удалить
+        });
+    });
+});
+</script>
+</body>
+</html>
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tree Navigation</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        h3 { cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h3>Заголовок 1</h3>
+    <button>Нажми меня</button>
+</div>
+<div class="card">
+    <h3>Заголовок 2</h3>
+    <button>Нажми меня</button>
+</div>
+<div class="card">
+    <h3>Заголовок 3</h3>
+    <button>Нажми меня</button>
+</div>
+<script>
+$(document).ready(function(){
+    $('button').click(function(){
+        // Используем parent() и find()
+        $(this).parent().find('h3').css('color', 'blue');
+    });
+});
+</script>
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Modal Window</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { position: relative; min-height: 100vh; padding-top: 50px; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,.5);
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,.5);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+<button id="openModalBtn">Открыть окно</button>
+<div class="modal">
+    Это модальное окно.<br />
+    <button id="closeModalBtn">Закрыть</button>
+</div>
+<div class="overlay"></div>
+<script>
+$(document).ready(function(){
+    $('#openModalBtn').click(function(){
+        $('.modal').fadeIn();
+        $('.overlay').show();
+    });
+    
+    $('#closeModalBtn, .overlay').click(function(){
+        $('.modal').fadeOut();
+        $('.overlay').hide();
+    });
+});
+</script>
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Form Validation</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        span.error { color: red; }
+    </style>
+</head>
+<body>
+<form id="loginForm">
+    Логин:<br /><input type="text" name="username"/><span class="error"></span><br/>
+    Пароль:<br /><input type="password" name="password"/><span class="error"></span><br/><br/>
+    <button type="submit">Отправить</button>
+</form>
+<script>
+$(document).ready(function(){
+    $('#loginForm').submit(function(event){
+        let valid = true;
+        
+        $('input[type=text], input[type=password]', this).each(function(){
+            if (!$(this).val()) {
+                $(this).next('.error').text('Обязательно!');
+                valid = false;
+            } else {
+                $(this).next('.error').empty();
+            }
+        });
+        
+        if (!valid) {
+            event.preventDefault(); // Предотвращаем отправку формы
+        } else {
+            alert('Успешно!');
+        }
+    });
+});
+</script>
+</body>
+</html>
+
